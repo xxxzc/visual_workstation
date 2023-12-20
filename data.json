@@ -1,0 +1,66 @@
+{
+    "city": "上海",
+    "zone": "杨高南路",
+    "floor": "12层",
+    "height": 80,
+    "width": 80,
+    "objects": [
+        {
+            "id": "100",
+            "template": "NormalSeat",
+            "type": "Seat",
+            "name": "正常工位",
+            "width": 2,
+            "height": 1,
+            "depth": 1,
+            "x": 8,
+            "y": 31,
+            "z": 1,
+            "color": "#aabbcc",
+            "text": "A-111",
+            "model": ""
+        }
+    ],
+    "templates": {
+        "NormalSeat": {
+            "template": "NormalSeat",
+            "type": "Seat",
+            "name": "正常工位",
+            "width": 2,
+            "height": 1,
+            "depth": 1,
+            "color": "#aabbcc",
+            "text": "工位"
+        },
+        "MeetingRom": {
+            "template": "MeetingRom",
+            "type": "Room",
+            "name": "会议室",
+            "width": 7,
+            "height": 4,
+            "depth": 1,
+            "color": "#aabbcc",
+            "text": "会议室"
+        },
+        "GlassWall": {
+            "template": "GlassWall",
+            "type": "Wall",
+            "name": "玻璃墙",
+            "width": 1,
+            "height": 1,
+            "depth": 1,
+            "color": "#aabbcc",
+            "text": "墙"
+        },
+        "MicroWave": {
+            "template": "MicroWave",
+            "type": "Appliance",
+            "name": "微波炉",
+            "width": 2,
+            "height": 1,
+            "depth": 1,
+            "color": "#aabbcc",
+            "text": "微波炉"
+        }
+    }
+}

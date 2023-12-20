@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>My first three.js app</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        #panel {
+            position: absolute;
+            z-index: 99;
+            top: 10px;
+            left: 10px;
+        }
+
+        .space {
+            margin: 6px 0;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+    <link rel="stylesheet" href="lib/antd.min.css">
+</head>
+
+<body>
+    <div id="panel" v-cloak>
+        <a-card title="控制面板" size="small" style="width: 300px">
+            <!-- <template #extra><a href="#">more</a></template> -->
+            <a-space class="space">
+                <a-radio-group v-model="template">
+                    <a-radio v-for="(v,k) in templates" :key="k" :value="v">{{v.name}}</a-radio>
+                </a-radio-group>
+            </a-space>
+            <a-space class="space">
+                编号 <a-input placeholder="编号" v-model="template.id" />
+            </a-space>
+            <a-space class="space">
+                纵向 <a-input-number id="height" v-model="template.height" :min="1" :max="100"
+                    @change="onSizeChange"></a-input-number>
+                横向 <a-input-number id="width" v-model="template.width" :min="1" :max="100"
+                    @change="onSizeChange"></a-input-number>
+            </a-space>
+            <a-space class="space">
+                名称 <a-input placeholder="名称" v-model="template.text" />
+            </a-space>
+            <a-space class="space">
+                颜色 <a-input placeholder="颜色" v-model="template.color" />
+            </a-space>
+            <a-space class="space">
+                <a-button size="small" @click="onAdd">添加</a-button>
+                <a-button size="small" @click="onDelete">删除</a-button>
+                <a-button size="small" @click="onSaveAll">保存全部</a-button>
+            </a-space>
+        </a-card>
+    </div>
+    <!-- <script type="importmap">
+    {
+        "imports": {
+        "three": "./lib/three/three.module.min.js",
+        "three/addons/": "./lib/three/addons/"
+        }
+    }
+    </script> -->
+    <script type="module" src="lib/vue.min.js"></script>
+    <script type="module" src="lib/antd.min.js"></script>
+    <script type="module" src="/main.js"></script>
+</body>
+
+</html>
