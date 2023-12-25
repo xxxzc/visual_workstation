@@ -7,60 +7,39 @@
     "objects": [
         {
             "id": "100",
-            "template": "NormalSeat",
-            "type": "Seat",
+            "category": "Seat",
+            "tid": "NormalSeat",
             "name": "正常工位",
-            "width": 2,
-            "height": 1,
-            "depth": 1,
-            "x": 8,
-            "y": 31,
-            "z": 1,
-            "color": "#aabbcc",
+            "size": [2, 1, 1],
+            "position": [8, 31, 1],
             "text": "A-111",
             "model": ""
         }
     ],
-    "templates": {
-        "NormalSeat": {
-            "template": "NormalSeat",
-            "type": "Seat",
+    "templates": [
+        {
+            "category": "Seat",
+            "tid": "NormalSeat",
             "name": "正常工位",
-            "width": 2,
-            "height": 1,
-            "depth": 1,
-            "color": "#aabbcc",
-            "text": "工位"
+            "size": [2, 1, 1]
         },
-        "MeetingRom": {
-            "template": "MeetingRom",
-            "type": "Room",
+        {
+            "category": "Room",
+            "tid": "MeetingRom",
             "name": "会议室",
-            "width": 7,
-            "height": 4,
-            "depth": 1,
-            "color": "#aabbcc",
-            "text": "会议室"
+            "size": [7, 4, 1]
         },
-        "GlassWall": {
-            "template": "GlassWall",
-            "type": "Wall",
+        {
+            "category": "Wall",
+            "tid": "GlassWall",
             "name": "玻璃墙",
-            "width": 1,
-            "height": 1,
-            "depth": 1,
-            "color": "#aabbcc",
-            "text": "墙"
+            "size": [1, 1, 1]
         },
-        "MicroWave": {
-            "template": "MicroWave",
-            "type": "Appliance",
+        {
+            "category": "Appliance",
+            "tid": "MicroWave",
             "name": "微波炉",
-            "width": 2,
-            "height": 1,
-            "depth": 1,
-            "color": "#aabbcc",
-            "text": "微波炉"
+            "size": [1, 1, 1]
         }
-    }
+    ]
 }

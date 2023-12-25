@@ -4,35 +4,89 @@ import { GLTFLoader } from './lib/three/addons/loaders/GLTFLoader.js';
 import { TextGeometry } from './lib/three/addons/geometries/TextGeometry.js';
 import { FontLoader } from './lib/three/addons/loaders/FontLoader.js';
 
-const fontLoader = new FontLoader();
-const gltfLoader = new GLTFLoader();
+const fontLoader = new FontLoader()
+const gltfLoader = new GLTFLoader()
+var fontObj = undefined // 字体文件对象
 
-let font = undefined
+class Template {
+    constructor(t) {
+        this.category = t.category // 模板类别
 
-function strLen(str) {
-    var count = 0;
-    for (var i = 0, len = str.length; i < len; i++) {
-        count += str.charCodeAt(i) < 256 ? 1 : 2;
+        this.tid = t.tid // 模板id
+        this.name = t.name // 模板名称
+
+        this.size = t.size // 物体尺寸
+        this.color = t.color // 平面物体颜色
+        this.text = t.text // 平面物体标签
+
+        this.model = t.model // 立体模型
+        this.scale = t.scale // 立体模型缩放
     }
-    return count;
 }
 
-function Box({ width, height, color }) {
-    const geometry = new THREE.BoxGeometry(width, height, 1)
-    const material = new THREE.MeshBasicMaterial({ color: color })
+const Mode = {
+    Edit: "编辑模式", // 编辑模式
+    Text: "平面预览", // 2D展示
+    Model: "立体展示" // 3D展示
+}
+
+class ObjMeta extends Template {
+    constructor(o, t) {
+        let ot = Object.assign({}, o || {}, t || {})
+        super(ot)
+        this.id = ot.id // 物体id
+        this.position = ot.position // 物体位置
+    }
+
+    build = (mode) => {
+        // @type {THREE.Object3D} obj
+        let obj
+        if (mode === Mode.Edit) {
+            obj = this.buildEdit()
+        }
+        obj.position.set(...this.position)
+        return obj
+    }
+
+    buildEdit = () => {
+        return Box(this)
+    }
+}
+
+
+/**
+ * 基本 3D 盒子
+ * @param {ObjMeta} meta
+ * @returns 
+ */
+function Box(meta) {
+    const geometry = new THREE.BoxGeometry(...meta.size)
+    const material = new THREE.MeshBasicMaterial({ color: meta.color })
     return new THREE.Mesh(geometry, material)
 }
 
+function strLen(str) {
+    var count = 0;
+    for (var i = 0, len = str.length; i < len; i++)
+        count += str.charCodeAt(i) < 256 ? 1 : 2;
+    return count;
+}
+
+/**
+ * 基本文字
+ * @param {*} param0 
+ * @returns 
+ */
 async function Text({ width, height, text = "自定义", color = "#aabbcc" }) {
     const group = new THREE.Group()
 
     if (text) {
-        if (!font) font = await fontLoader.loadAsync('fonts/AlibabaPuHuiTi_Regular.json')
+        if (!fontObj) fontObj = await fontLoader.loadAsync('fonts/AlibabaPuHuiTi_Regular.json')
 
         function Text(t, y) {
             let mesh = new THREE.Mesh(
                 new TextGeometry(t, {
-                    font: font, size: 0.3, height: 0.1
+                    font: fontObj, size: 0.3, height: 0.1
                 }), new THREE.MeshBasicMaterial({ color: 0x000000 })
             )
             mesh.position.set(-width / 2, y, 0.5)

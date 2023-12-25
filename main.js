@@ -1,5 +1,6 @@
 import Floor from './floor.js'
-import helper from './helper.js'
+import helper from './objecter.js'
+
 const floor = new Floor()
 
 const Panel = new Vue({
