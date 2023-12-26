@@ -8,10 +8,18 @@ const fontLoader = new FontLoader()
 const gltfLoader = new GLTFLoader()
 var fontObj = undefined // 字体文件对象
 
-class Template {
-    constructor(t) {
-        this.category = t.category // 模板类别
 
+class MetaObject {
+    Mode = {
+        Box: "Box",
+        Text: "Text",
+        Model: "Model"
+    }
+
+    constructor(...metas) {
+        let t = Object.assign({}, ...metas.map(x => x || {}))
+
+        this.category = t.category // 模板类别
         this.tid = t.tid // 模板id
         this.name = t.name // 模板名称
 
@@ -21,49 +29,49 @@ class Template {
 
         this.model = t.model // 立体模型
         this.scale = t.scale // 立体模型缩放
+
+        this.id = t.id // 物体 id
+        this.position = t.position // 物体位置
     }
-}
 
-const Mode = {
-    Edit: "编辑模式", // 编辑模式
-    Text: "平面预览", // 2D展示
-    Model: "立体展示" // 3D展示
-}
+    asTemplate = () => {
+        return {
+            category: this.category,
+            tid: this.tid, name: this.name,
+            size: this.size,
+            color: this.color, text: this.text,
+            model: this.model, scale: this.scale
+        }
+    }
 
-class ObjMeta extends Template {
-    constructor(o, t) {
-        let ot = Object.assign({}, o || {}, t || {})
-        super(ot)
-        this.id = ot.id // 物体id
-        this.position = ot.position // 物体位置
+    asMeta = () => {
+        let meta = this.asTemplate()
+        meta.id = this.id
+        meta.position = this.position
+        return meta
     }
 
     build = (mode) => {
-        // @type {THREE.Object3D} obj
+        /**
+         * @type {THREE.Object3D} obj
+         */
         let obj
-        if (mode === Mode.Edit) {
-            obj = this.buildEdit()
+        if (mode === this.Mode.Box) {
+            obj = this.box()
+        } else if (mode === this.Mode.Text) {
+            
         }
         obj.position.set(...this.position)
         return obj
     }
 
-    buildEdit = () => {
-        return Box(this)
+    box = () => {
+        const geometry = new THREE.BoxGeometry(...this.size)
+        const material = new THREE.MeshBasicMaterial({ color: this.color })
+        return new THREE.Mesh(geometry, material)
     }
 }
 
-
-/**
- * 基本 3D 盒子
- * @param {ObjMeta} meta
- * @returns 
- */
-function Box(meta) {
-    const geometry = new THREE.BoxGeometry(...meta.size)
-    const material = new THREE.MeshBasicMaterial({ color: meta.color })
-    return new THREE.Mesh(geometry, material)
-}
 
 function strLen(str) {
     var count = 0;
