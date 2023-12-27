@@ -4,8 +4,10 @@ data.json 组成
 
 ```json
 {
-    "city": "上海", "zone": "杨高南路", "floor": "12层",
-    "width": 100, "height": 100,
+    "city": "上海", "zone": "杨高南路", "building": "一号楼", "floor": "12层",
+    "id": [0, 1, 2, 3],
+    "name": ["上海", "杨高南路", "一号楼", "12层"]
+    "size": [100, 100, ]
     "objects": [], "templates": {}
 }
 ```

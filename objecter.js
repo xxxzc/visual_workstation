@@ -8,7 +8,6 @@ const fontLoader = new FontLoader()
 const gltfLoader = new GLTFLoader()
 var fontObj = undefined // 字体文件对象
 
-
 class MetaObject {
     Mode = {
         Box: "Box",
@@ -51,43 +50,43 @@ class MetaObject {
         return meta
     }
 
-    build = (mode) => {
+    build = async (mode) => {
         /**
          * @type {THREE.Object3D} obj
          */
         let obj
         if (mode === this.Mode.Box) {
-            obj = this.box()
+            obj = this.buildBox()
         } else if (mode === this.Mode.Text) {
-            
+            obj = await this.buildText()
         }
         obj.position.set(...this.position)
+        obj.meta = this.asMeta()
         return obj
     }
 
-    box = () => {
+    buildBox = () => {
         const geometry = new THREE.BoxGeometry(...this.size)
         const material = new THREE.MeshBasicMaterial({ color: this.color })
         return new THREE.Mesh(geometry, material)
     }
+
+    buildText = async () => {
+        let group = await Text(this)
+        group.add(this.buildBox())
+        return group
+    }
 }
 
-
-function strLen(str) {
-    var count = 0;
-    for (var i = 0, len = str.length; i < len; i++)
-        count += str.charCodeAt(i) < 256 ? 1 : 2;
-    return count;
-}
 
 /**
  * 基本文字
- * @param {*} param0 
  * @returns 
  */
-async function Text({ width, height, text = "自定义", color = "#aabbcc" }) {
+async function Text({ size, text = "自定义", color = "#aabbcc" }) {
     const group = new THREE.Group()
-
+    let width = size[0]
+    let height = size[1]
     if (text) {
         if (!fontObj) fontObj = await fontLoader.loadAsync('fonts/AlibabaPuHuiTi_Regular.json')
 
@@ -100,6 +99,14 @@ async function Text({ width, height, text = "自定义", color = "#aabbcc" }) {
             mesh.position.set(-width / 2, y, 0.5)
             return mesh
         }
+
+        function strLen(str) {
+            var count = 0;
+            for (let i = 0, len = str.length; i < len; i++)
+                count += str.charCodeAt(i) < 256 ? 1 : 2;
+            return count;
+        }
+
         let length = strLen(text)
         let per = width * 3
         if (length != text.length)
@@ -112,12 +119,6 @@ async function Text({ width, height, text = "自定义", color = "#aabbcc" }) {
             group.add(text2)
         }
     }
-    return group
-}
-
-async function TextBox(object) {
-    let group = await Text(object)
-    group.add(Box(object))
     return group
 }
 
@@ -161,4 +162,4 @@ class MyGridHelper extends THREE.LineSegments {
 
 }
 
-export default { THREE, TextBox, Box, MyGridHelper }
+export default { THREE, MetaObject, MyGridHelper }
