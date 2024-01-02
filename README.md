@@ -16,7 +16,7 @@ scene.json 组成
 
 #### MetaObject
 
-objects 和 templates 都是 MetaObject，用于构建实际的 three.js 的 Object3D 模型，作为 meta 字段存储
+objects 和 templates 都是 MetaObject，用于构建 three.js 的 Object3D 模型，存储于 Object3D 的 meta 字段
 
 ```js
 {
@@ -31,7 +31,7 @@ objects 和 templates 都是 MetaObject，用于构建实际的 three.js 的 Obj
     // 3d
     "model3d": "", // 当使用3D显示时，使用的模型文件
     "scale": 1.0, // 模型的缩放比例
-    // metaobject 独有字段
+    // object 独有字段
     "id": "100", // 物体的唯一标志
     "position": [8, 31, 1], // x、y、z（左下角）
 }

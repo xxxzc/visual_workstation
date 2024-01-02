@@ -1,18 +1,5 @@
 import * as THREE from 'three'
 
-import { GLTFLoader } from '../lib/three/addons/loaders/GLTFLoader.js';
-import { TextGeometry } from '../lib/three/addons/geometries/TextGeometry.js';
-import { FontLoader } from '../lib/three/addons/loaders/FontLoader.js';
-
-const fontLoader = new FontLoader()
-const gltfLoader = new GLTFLoader()
-var fontObj = undefined // 字体文件对象
-
-const Mode = {
-    D2: "D2",
-    D3: "D3"
-}
-
 export default class MetaObject {
 
     constructor(...metas) {
@@ -25,9 +12,10 @@ export default class MetaObject {
         this.size = t.size // 物体尺寸
         this.color = t.color // 平面物体颜色
         this.text = t.text // 平面物体标签
-
-        this.model = t.model // 立体模型
+        this.model2d = t.model2d // 平面模型
+        this.model3d = t.model3d // 立体模型
         this.scale = t.scale // 立体模型缩放
+        this.rotate = 0 // 物体旋转角度
 
         this.id = t.id // 物体 id
         this.position = t.position // 物体位置
@@ -36,10 +24,9 @@ export default class MetaObject {
     asTemplate = () => {
         return {
             category: this.category,
-            tid: this.tid, name: this.name,
-            size: this.size,
-            color: this.color, text: this.text,
-            model: this.model, scale: this.scale
+            tid: this.tid, name: this.name, text: this.text,
+            model2d: this.model2d, size: this.size, color: this.color,
+            model3d: this.model3d, scale: this.scale, rotate: this.rotate
         }
     }
 
@@ -50,27 +37,16 @@ export default class MetaObject {
         return meta
     }
 
-    build = async (mode) => {
-        /**
-         * @type {THREE.Object3D} obj
-         */
-        let obj
-        if (mode === Mode.D3) {
-            obj = await this.buildText()
-        } else obj = this.build2d()
-        obj.position.set(...this.position)
-        obj.meta = this.asMeta()
-        return obj
-    }
-
-    build2d = () => {
+    build2d = async () => {
         const geometry = new THREE.BoxGeometry(...this.size)
-        const material = new THREE.MeshBasicMaterial({ color: this.color })
+        const material = new THREE.MeshBasicMaterial({ color: this.color || 0xff0000, opacity: 0.5, transparent: true })
         return new THREE.Mesh(geometry, material)
     }
 
-    build3d = () => {
-
+    build3d = async (ctx) => {
+        if (!this.model3d) return this.build2d()
+        let model = await ctx.loader.load(this.model3d)
+        return model.scene
     }
 
     // buildText = async () => {

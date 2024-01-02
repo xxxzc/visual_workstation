@@ -1,32 +1,18 @@
 {
-    "city": "上海",
-    "zone": "杨高南路",
-    "floor": "12层",
-    "height": 80,
-    "width": 80,
-    "objects": [
-        {
-            "id": "100",
-            "category": "Seat",
-            "tid": "NormalSeat",
-            "name": "正常工位",
-            "size": [2, 1, 1],
-            "position": [8, 31, 1],
-            "text": "A-111",
-            "model": ""
-        }
-    ],
+    "id": "0-01-001-12",
+    "path": ["上海", "杨高南路", "一号楼", "12层"],
+    "size": [50, 50, 4],
     "templates": [
         {
             "category": "Seat",
             "tid": "NormalSeat",
             "name": "正常工位",
-            "size": [2, 1, 1]
+            "size": [1, 0.5, 0.5]
         },
         {
             "category": "Room",
-            "tid": "MeetingRom",
-            "name": "会议室",
+            "tid": "Room",
+            "name": "房间",
             "size": [7, 4, 1]
         },
         {
@@ -39,7 +25,20 @@
             "category": "Appliance",
             "tid": "MicroWave",
             "name": "微波炉",
-            "size": [1, 1, 1]
+            "size": [0.4, 0.3, 0.3]
+        }
+    ],
+    "objects": [
+        {
+            "id": "100",
+            "category": "Seat",
+            "tid": "NormalSeat",
+            "name": "正常工位",
+            "size": [0.5, 0.5, 0.5],
+            "position": [8, 31, 1],
+            "text": "A-111",
+            "model2d": "",
+            "model3d": "model/Desk.glb"
         }
     ]
 }

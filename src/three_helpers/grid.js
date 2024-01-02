@@ -11,7 +11,7 @@ export default class Grid extends THREE.LineSegments {
      * @param {string} options.colorSub 辅助线颜色
      */
     constructor(width, height, {
-        cell = 1, colorMain = 0x444444, colorSub = 0x888888
+        cell = 1, colorMain = 0x999999, colorSub = 0xcccccc
     }) {
         colorMain = new THREE.Color(colorMain);
         colorSub = new THREE.Color(colorSub);

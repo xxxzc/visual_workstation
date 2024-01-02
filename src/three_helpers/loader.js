@@ -1,54 +1,64 @@
-import { GLTFLoader } from '../../lib/three/addons/loaders/GLTFLoader.js';
-import { FontLoader } from '../../lib/three/addons/loaders/FontLoader.js';
-import { SVGLoader } from '../../lib/three/addons/loaders/SVGLoader.js';
+import * as THREE from 'three'
+
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 
 const defaultFont = 'fonts/AlibabaPuHuiTi_Regular.json'
 
 export default class Loader {
-    /**
-     * 模型、字体等加载器
-     * @param {string[]} urls
-     */
-    constructor(urls) {
+    constructor() {
         this.fontLoader = new FontLoader()
         this.gltfLoader = new GLTFLoader()
         this.svgLoader = new SVGLoader()
         this.imgLoader = new THREE.ImageLoader()
-
         this.objects = {}
-
-        // 预加载
-        fonts.forEach(this.loadFont)
-        models.forEach(this.loadModel)
-        urls.forEach(
-            x => {
-                if (x.startsWith('fonts/')) this.loadFont(x)
-                else if (x.endsWith('.glb')) this.loadModel(x)
-                else if (x.endsWith('.svg')) this.loadSvg(x)
-                else this.loadImg(x)
-            }
-        )
     }
 
-    load = async (loader, url) => {
+    /**
+     * 模型、字体等加载器
+     * @param {string[]} urls
+     */
+    async loadMany(urls) {
+        urls.push(defaultFont)
+        await Promise.all([...new Set(urls)].map(x => this.load(x)))
+    }
+
+    /**
+     * 
+     * @param {string} x 
+     * @returns {THREE.Loader}
+     */
+    getLoader = (x) => {
+        if (x.startsWith('fonts/')) return this.fontLoader
+        else if (x.endsWith('.glb')) return this.gltfLoader
+        else if (x.endsWith('.svg')) return this.svgLoader
+        else return this.imgLoader
+    }
+
+    load = async (url, loader) => {
+        if (!url) return
         if (url in this.objects) return this.objects[url]
+        if (!loader) {
+            loader = this.getLoader(url)
+        }
         this.objects[url] = await loader.loadAsync(url)
         return this.objects[url]
     }
 
     loadFont = (font = defaultFont) => {
-        return this.load(this.fontLoader, font)
+        return this.load(font, this.fontLoader)
     }
 
     loadModel = (model) => {
-        return this.load(this.gltfLoader, model)
+        return this.load(model, this.gltfLoader)
     }
 
     loadSvg = (svg) => {
-        return this.load(this.svgLoader, svg)
+        return this.load(svg, this.svgLoader)
     }
 
     loadImg = (img) => {
-        return this.load(this.imgLoader, img)
+        return this.load(img, this.imgLoader)
     }
 }
