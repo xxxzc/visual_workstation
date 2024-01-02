@@ -8,12 +8,12 @@ const fontLoader = new FontLoader()
 const gltfLoader = new GLTFLoader()
 var fontObj = undefined // 字体文件对象
 
-class MetaObject {
-    Mode = {
-        Box: "Box",
-        Text: "Text",
-        Model: "Model"
-    }
+const Mode = {
+    D2: "D2",
+    D3: "D3"
+}
+
+export default class MetaObject {
 
     constructor(...metas) {
         let t = Object.assign({}, ...metas.map(x => x || {}))
@@ -55,26 +55,29 @@ class MetaObject {
          * @type {THREE.Object3D} obj
          */
         let obj
-        if (mode === this.Mode.Box) {
-            obj = this.buildBox()
-        } else if (mode === this.Mode.Text) {
+        if (mode === Mode.D3) {
             obj = await this.buildText()
-        }
+        } else obj = this.build2d()
         obj.position.set(...this.position)
         obj.meta = this.asMeta()
         return obj
     }
 
-    buildBox = () => {
+    build2d = () => {
         const geometry = new THREE.BoxGeometry(...this.size)
         const material = new THREE.MeshBasicMaterial({ color: this.color })
         return new THREE.Mesh(geometry, material)
     }
 
-    buildText = async () => {
-        let group = await Text(this)
-        group.add(this.buildBox())
-        return group
+    build3d = () => {
+
     }
+
+    // buildText = async () => {
+    //     let group = await Text(this)
+    //     group.add(this.buildBox())
+    //     return group
+    // }
 }
+
 

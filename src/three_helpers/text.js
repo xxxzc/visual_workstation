@@ -6,8 +6,6 @@ import { FontLoader } from '../../lib/three/addons/loaders/FontLoader.js';
 const fontLoader = new FontLoader()
 var fontObj = undefined // 字体文件对象
 
-
-
 /**
  * 基本文字
  * @returns 
