@@ -46,6 +46,9 @@ export default class MetaObject {
     build3d = async (ctx) => {
         if (!this.model3d) return this.build2d()
         let model = await ctx.loader.load(this.model3d)
+        // let group = new THREE.Group()
+        // group.add(model.scene)
+        // group.add(await this.build2d())
         return model.scene
     }
 

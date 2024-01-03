@@ -2,6 +2,7 @@ import * as THREE from 'three'
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 
 import { generateUUID } from 'three/src/math/MathUtils.js';
 
@@ -21,11 +22,23 @@ export default class Scene {
                      * @type {THREE.Object3D} object
                      */
                     object: null,
-                    meta: {}
+                    meta: {},
+                    mode: 'translate'
+                }
+            },
+            watch: {
+                mode(value) {
+                    if (value === 'rotate') {
+                        that.moveControl.showZ = true
+                    } else {
+                        that.moveControl.showZ = false
+                    }
+                    that.moveControl.mode = value
                 }
             },
             methods: {
                 setObject(object) {
+                    if (this.object === object) return
                     this.object = object
                     if (object) {
                         this.meta = object.meta
@@ -42,12 +55,9 @@ export default class Scene {
                 onDelete() {
                     that.removeObject(this.object)
                     this.object = null
-                },
-                onRotate() {
-
                 }
             }
-        })        
+        })
     }
 
     addObject = async (meta) => {
@@ -64,8 +74,18 @@ export default class Scene {
         this.render()
     }
 
+    detachObject = (object) => {
+        if (this.moveControl.object === object) {
+            this.moveControl.detach();
+            this.rotateControl.detach();
+        }
+        this.panel.setObject(null)
+        this.render();
+    }
+
     removeObject = (object) => {
         this.objects.splice(this.objects.indexOf(object), 1)
+        this.detachObject(object)
         this.scene.remove(object)
         this.render()
     }
@@ -103,11 +123,10 @@ export default class Scene {
 
         // 相机
         const camera = this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
-        camera.position.set(0, 0, width*1.2)
+        camera.position.set(width/2, height/2, width*1.5)
         // 场景
         const scene = this.scene = new THREE.Scene()
         scene.background = new THREE.Color(0xf0f0f0)
-        scene.position.set(-width/2, -height/2, 0)
         // 网格线
         const grid = this.grid = new Grid(width, height, {})
         scene.add(grid)
@@ -123,30 +142,46 @@ export default class Scene {
         renderer.setPixelRatio(window.devicePixelRatio)
         renderer.setSize(window.innerWidth, window.innerHeight)
         document.body.appendChild(renderer.domElement)
+        window.addEventListener('resize', this.onWindowResize)
 
+        // 轨道控制器，控制场景的缩放、旋转和移动
         const orbitControl = this.orbitControl = new OrbitControls(camera, renderer.domElement)
         orbitControl.enablePan = true
-        orbitControl.target.set( 0, 0, 0 );
-		orbitControl.update();
-		orbitControl.addEventListener( 'change', this.render );
+        orbitControl.target.set(width/2, height/2, 0)
+		orbitControl.update()
+		orbitControl.addEventListener('change', this.render)
+
+        this.raycaster = new THREE.Raycaster()
+        this.pointer = new THREE.Vector2()
+        this.onUpPosition = new THREE.Vector2()
+        this.onDownPosition = new THREE.Vector2()
+        document.addEventListener('pointerdown', this.onPointerDown);
+		document.addEventListener('pointerup', this.onPointerUp);
+		document.addEventListener('pointermove', this.onPointerMove);
+
+        // 物体移动控制器
+        const moveControl = this.moveControl = new TransformControls( camera, renderer.domElement );
+        moveControl.size = 0.4
+        moveControl.showZ = false
+        moveControl.translationSnap = 0.5
+        moveControl.addEventListener('change', this.render)
+        moveControl.addEventListener('dragging-changed', (event) => {
+            orbitControl.enabled = ! event.value;
+        })
+        // moveControl.position.y += 3 
+        scene.add(moveControl)
+
+        const rotateControl = this.rotateControl = new TransformControls( camera, renderer.domElement );
+        rotateControl.enabled = false
+        rotateControl.size = 0.2
+        rotateControl.mode = 'rotate'
+        rotateControl.addEventListener('change', this.render)
+        rotateControl.addEventListener('dragging-changed', (event) => {
+            orbitControl.enabled = ! event.value
+        })
+        // scene.add(rotateControl)
 
         this.objects = []
-        const dragControl = this.dragControl = new DragControls(this.objects, camera, renderer.domElement)
-        dragControl.addEventListener('dragstart', (event) => {
-            orbitControl.enableRotate = false
-            this.panel.setObject(event.object)
-            console.log(event.object)
-        })
-        dragControl.addEventListener('drag', (event) => {
-            this.alignToGrid(event.object)
-            this.render()
-        })
-        dragControl.addEventListener('dragend', () => {
-            orbitControl.enableRotate = true
-            this.panel.setObject(null)
-        })
-
-        window.addEventListener('resize', this.onWindowResize)
 
         // 加载物体
         this.templates = {}
@@ -161,6 +196,44 @@ export default class Scene {
         )
         objects.forEach(this.addObject)
         this.render()
+    }
+
+    onPointerDown = (event) => {
+        if (event.target.tagName !== 'CANVAS') return
+        this.onDownPosition.set(event.clientX, event.clientY)
+    }
+
+    onPointerUp = (event) => {
+        if (event.target.tagName !== 'CANVAS') return
+        this.onUpPosition.set(event.clientX, event.clientY)
+        if ( this.onDownPosition.distanceTo( this.onUpPosition ) === 0) {
+            this.detachObject(this.moveControl.object)
+        }
+    }
+
+    onPointerMove = (event) => {
+        this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
+		this.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        this.raycaster.setFromCamera( this.pointer, this.camera );
+        const intersects = this.raycaster.intersectObjects( this.objects, true );
+        if (intersects.length > 0) {
+            let object = intersects[ 0 ].object
+            // object with meta is the object we built
+            while (!object.meta) object = object.parent
+            if ( object !== this.moveControl.object ) {
+                this.currentObject = object
+                this.moveControl.attach( object );
+                this.rotateControl.attach( object );
+                this.panel.setObject(this.moveControl.object)
+                this.panel.$el.style.left = (event.clientX + 50) + 'px'
+                this.panel.$el.style.top = (event.clientY - 10) + 'px'
+            }
+        }
+        if (this.moveControl.dragging) {
+            this.panel.$el.style.left = (event.clientX + 50) + 'px'
+            this.panel.$el.style.top = (event.clientY - 10) + 'px'
+        }
+        
     }
 
     render = () => {

@@ -39,6 +39,17 @@
             "text": "A-111",
             "model2d": "",
             "model3d": "model/Desk.glb"
+        },
+        {
+            "id": "101",
+            "category": "Seat",
+            "tid": "NormalSeat",
+            "name": "正常工位",
+            "size": [1, 2, 0.5],
+            "position": [10, 21, 1],
+            "text": "A-111",
+            "model2d": "",
+            "model3d": "model/Desk.glb"
         }
     ]
 }

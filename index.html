@@ -14,6 +14,7 @@
             z-index: 99;
             top: 10px;
             left: 10px;
+            border-radius: 6px;
         }
 
         .space {
@@ -30,23 +31,26 @@
 <body>
     <div id="panel" v-cloak>
         <a-card v-if="object" title="信息" size="small" style="width: 280px">
-            <a-space class="space">
-                编号 <a-input placeholder="编号" v-model="meta.id" size="small" />
+            <div>
+            <a-radio-group v-model:value="mode" size="small">
+                <a-radio-button value="translate">移动</a-radio-button>
+                <a-radio-button value="rotate">旋转</a-radio-button>
+            </a-radio-group>
+            </div>
+            <a-space class="space" hidden>
+                主键 <a-input placeholder="id" v-model="meta.id" size="small" />
             </a-space>
             <a-space class="space">
-                长度 <a-input v-model="meta.size[0]" size="small" @change="onSave"></a-input>
-                宽度 <a-input v-model="meta.size[1]" size="small" @change="onSave"></a-input>
+                类型 <a-input v-model="meta.name" size="small" />
             </a-space>
             <a-space class="space">
-                名称 <a-input placeholder="名称" v-model="meta.text" size="small" />
+                编号 <a-input v-model="meta.text" size="small" />
             </a-space>
             <a-space class="space">
-                颜色 <a-input placeholder="颜色" v-model="meta.color" size="small" />
+                长 <a-input v-model="meta.size[0]" size="small" @change="onSave"></a-input>
+                宽 <a-input v-model="meta.size[1]" size="small" @change="onSave"></a-input>
             </a-space>
-            <a-space class="space">
-                <a-button size="small" @click="onRotate">旋转</a-button>
-            </a-space>
-            <a-space class="space">
+            <a-space class="space" style="margin-top: 20px;">
                 <a-button size="small" @click="onSave">保存</a-button>
                 <a-button size="small" @click="onCopy">复制</a-button>
                 <a-button size="small" @click="onDelete">删除</a-button>
