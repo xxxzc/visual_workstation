@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "ant-design-vue": "^4.0.7",
-    "three": "^0.159.0",
+    "three": "^0.160.0",
     "vue": "^3.3.9"
   },
   "devDependencies": {

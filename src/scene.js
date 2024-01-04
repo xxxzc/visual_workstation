@@ -12,6 +12,125 @@ import Loader from './three_helpers/loader.js'
 
 export default class Scene {
 
+    /**
+     * @param {Object} data
+     * @param {number[]} data.size 
+     * @param {Object[]} data.objects
+     * @param {Object[]} data.templates 
+     * @param {string} mode 
+     */
+    async build({ size, objects, templates }, mode = "2d") {
+        this.data = arguments[0]
+        this.size = size
+        const width = size[0]
+        const height = size[1]
+        this.mode = mode // 展示模式
+
+        // 相机
+        const camera = this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
+        camera.position.set(width / 3, height / 2, width * 1.3)
+        // 场景
+        const scene = this.scene = new THREE.Scene()
+        scene.background = new THREE.Color(0xf0f0f0)
+        // 网格线
+        const grid = this.grid = new Grid(width, height, {})
+        scene.add(grid)
+        // 平面
+        const geometry = new THREE.PlaneGeometry(width, height, width, height)
+        const plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: false }))
+        scene.add(plane)
+
+        this.buildLight() // 灯光
+        this.buildPanel() // 物体控制面板
+
+        // 渲染器
+        const renderer = this.renderer = new THREE.WebGLRenderer({ antialias: true })
+        renderer.setPixelRatio(window.devicePixelRatio)
+        renderer.setSize(window.innerWidth, window.innerHeight)
+        document.body.appendChild(renderer.domElement)
+
+        window.addEventListener('resize', this.onWindowResize)
+
+        // 轨道控制器，控制场景的缩放、旋转和移动
+        const orbitControl = this.orbitControl = new OrbitControls(camera, renderer.domElement)
+        orbitControl.enablePan = true
+        orbitControl.target.set(width / 3, height / 2, 0)
+        orbitControl.update()
+        orbitControl.addEventListener('change', this.render)
+
+        this.raycaster = new THREE.Raycaster()
+        this.pointer = new THREE.Vector2()
+        this.onUpPosition = new THREE.Vector2()
+        this.onDownPosition = new THREE.Vector2()
+        document.addEventListener('pointerdown', this.onPointerDown);
+        document.addEventListener('pointerup', this.onPointerUp);
+        document.addEventListener('pointermove', this.onPointerMove);
+
+        // 物体移动控制器
+        const moveControl = this.moveControl = new TransformControls(camera, renderer.domElement);
+        moveControl.size = 0.4
+        moveControl.showZ = false
+        moveControl.translationSnap = 0.5
+        moveControl.rotationSnap = 1 / Math.PI
+        moveControl.setScaleSnap(0.5)
+        moveControl.space = 'local'
+        moveControl.addEventListener('change', this.render)
+        moveControl.addEventListener('dragging-changed', (event) => {
+            orbitControl.enabled = !event.value
+            console.log(moveControl.object)
+        })
+        // moveControl.position.y += 3 
+        scene.add(moveControl)
+
+        const rotateControl = this.rotateControl = new TransformControls(camera, renderer.domElement);
+        rotateControl.enabled = false
+        rotateControl.size = 0.2
+        rotateControl.mode = 'rotate'
+        rotateControl.addEventListener('change', this.render)
+        rotateControl.addEventListener('dragging-changed', (event) => {
+            orbitControl.enabled = !event.value
+        })
+        // scene.add(rotateControl)
+
+        // 先加载所有模型
+        this.loader = new Loader()
+        await this.loader.loadMany(
+            objects.map(x => x.model2d).concat(objects.map(x => x.model3d))
+                .concat(templates.map(x => x.model2d)).concat(templates.map(x => x.model3d))
+        )
+        this.objects = []
+
+        // 加载模板
+        this.templates = {}
+        templates.forEach((x, i) => {
+            this.templates[x.tid] = x
+            this.addObject(Object.assign({}, x, {
+                position: [-4, height - i * 2 - 2, 0], showLabel: true
+            }))
+        })
+        // 加载物体
+        objects.forEach(this.addObject)
+        this.render()
+
+        window.addEventListener('keydown', (event) => {
+            console.log(event)
+            switch (event.key) {
+                case 'r':
+                    this.panel.setMode('rotate')
+                    break
+                case 's':
+                    this.panel.setMode('scale')
+                    break
+                case 't':
+                    this.panel.setMode('translate')
+                    break
+                case 'Escape':
+                    this.moveControl.reset()
+                    break
+            }
+        })
+    }
+
     buildPanel = () => {
         const that = this
         this.panel = new Vue({
@@ -22,16 +141,23 @@ export default class Scene {
                      * @type {THREE.Object3D} object
                      */
                     object: null,
-                    meta: {},
                     mode: 'translate'
                 }
             },
             watch: {
                 mode(value) {
                     if (value === 'rotate') {
+                        that.moveControl.showX = false
+                        that.moveControl.showY = false
                         that.moveControl.showZ = true
+                    } else if (value === 'scale') {
+                        that.moveControl.showX = true
+                        that.moveControl.showY = true
+                        that.moveControl.showZ = false
                     } else {
                         that.moveControl.showZ = false
+                        that.moveControl.showX = true
+                        that.moveControl.showY = true
                     }
                     that.moveControl.mode = value
                 }
@@ -40,17 +166,19 @@ export default class Scene {
                 setObject(object) {
                     if (this.object === object) return
                     this.object = object
-                    if (object) {
-                        this.meta = object.meta
-                        this.meta.position = [object.position.x, object.position.y, object.position.z]
-                    }
+                },
+                setMode(mode) {
+                    this.mode = mode
                 },
                 onSave() {
                     that.updateObject(this.object)
                 },
                 onCopy() {
-                    let meta = Object.assign({ id: generateUUID().replace(/-/g, '') }, this.meta)
+                    let meta = Object.assign({ id: generateUUID().replace(/-/g, '') }, this.object.meta.toJson())
                     that.addObject(meta)
+                },
+                onReset() {
+                    that.resetObject(this.object)
                 },
                 onDelete() {
                     that.removeObject(this.object)
@@ -60,15 +188,19 @@ export default class Scene {
         })
     }
 
+    switchMode = (mode) => {
+        this.mode = mode
+        let objects = [...this.objects]
+        objects.forEach(this.resetObject)
+    }
+
     addObject = async (meta) => {
         let metaObject = new MetaObject({ id: generateUUID() }, this.templates[meta.tid], meta)
         /**
          * @type {THREE.Object3D} object
          */
-        let object = await (this.mode === '2d' ? metaObject.build2d(this) : metaObject.build3d(this))
-        object.meta = metaObject.asMeta()
-        object.position.set(...meta.position)
-        this.alignToGrid(object)
+        let object = await metaObject.build(this.mode, this.loader)
+
         this.objects.push(object)
         this.scene.add(object)
         this.render()
@@ -90,11 +222,14 @@ export default class Scene {
         this.render()
     }
 
-    updateObject = (object) => {
-        const meta = object.meta
-        meta.position = [object.position.x, object.position.y, object.position.z]
+    resetObject = (object) => {
         this.removeObject(object)
-        this.addObject(meta)
+        this.addObject(object.meta)
+    }
+
+    updateObject = (object) => {
+        object.meta.update(object)
+        this.resetObject(object)
     }
 
     /**
@@ -104,98 +239,7 @@ export default class Scene {
     alignToGrid = (object) => {
         const size = object.meta.size
         object.position.multiplyScalar(4).round().divideScalar(4)
-        object.position.z = size[2]/2
-    }
-
-    /**
-     * @param {Object} data
-     * @param {number[]} data.size 
-     * @param {Object[]} data.objects
-     * @param {Object[]} data.templates 
-     * @param {string} mode 
-     */
-    async build({size, objects, templates}, mode="2d") {
-        this.data = arguments[0]
-        this.size = size
-        const width = size[0]
-        const height = size[1]
-        this.mode = mode // 展示模式
-
-        // 相机
-        const camera = this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
-        camera.position.set(width/2, height/2, width*1.5)
-        // 场景
-        const scene = this.scene = new THREE.Scene()
-        scene.background = new THREE.Color(0xf0f0f0)
-        // 网格线
-        const grid = this.grid = new Grid(width, height, {})
-        scene.add(grid)
-        // 平面
-        const geometry = new THREE.PlaneGeometry(width, height, width, height)
-        const plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: false }))
-        scene.add(plane)
-
-        this.buildLight()
-        this.buildPanel()
-
-        const renderer = this.renderer = new THREE.WebGLRenderer({ antialias: true })
-        renderer.setPixelRatio(window.devicePixelRatio)
-        renderer.setSize(window.innerWidth, window.innerHeight)
-        document.body.appendChild(renderer.domElement)
-        window.addEventListener('resize', this.onWindowResize)
-
-        // 轨道控制器，控制场景的缩放、旋转和移动
-        const orbitControl = this.orbitControl = new OrbitControls(camera, renderer.domElement)
-        orbitControl.enablePan = true
-        orbitControl.target.set(width/2, height/2, 0)
-		orbitControl.update()
-		orbitControl.addEventListener('change', this.render)
-
-        this.raycaster = new THREE.Raycaster()
-        this.pointer = new THREE.Vector2()
-        this.onUpPosition = new THREE.Vector2()
-        this.onDownPosition = new THREE.Vector2()
-        document.addEventListener('pointerdown', this.onPointerDown);
-		document.addEventListener('pointerup', this.onPointerUp);
-		document.addEventListener('pointermove', this.onPointerMove);
-
-        // 物体移动控制器
-        const moveControl = this.moveControl = new TransformControls( camera, renderer.domElement );
-        moveControl.size = 0.4
-        moveControl.showZ = false
-        moveControl.translationSnap = 0.5
-        moveControl.addEventListener('change', this.render)
-        moveControl.addEventListener('dragging-changed', (event) => {
-            orbitControl.enabled = ! event.value;
-        })
-        // moveControl.position.y += 3 
-        scene.add(moveControl)
-
-        const rotateControl = this.rotateControl = new TransformControls( camera, renderer.domElement );
-        rotateControl.enabled = false
-        rotateControl.size = 0.2
-        rotateControl.mode = 'rotate'
-        rotateControl.addEventListener('change', this.render)
-        rotateControl.addEventListener('dragging-changed', (event) => {
-            orbitControl.enabled = ! event.value
-        })
-        // scene.add(rotateControl)
-
-        this.objects = []
-
-        // 加载物体
-        this.templates = {}
-        templates.forEach(x => {
-            this.templates[x.tid] = x
-        })
-        this.loader = new Loader()
-        // 先加载所有模型
-        await this.loader.loadMany(
-            objects.map(x => x.model2d).concat(objects.map(x => x.model3d))
-            .concat(templates.map(x => x.model2d)).concat(templates.map(x => x.model3d))
-        )
-        objects.forEach(this.addObject)
-        this.render()
+        object.position.z = size[2] / 2
     }
 
     onPointerDown = (event) => {
@@ -206,34 +250,34 @@ export default class Scene {
     onPointerUp = (event) => {
         if (event.target.tagName !== 'CANVAS') return
         this.onUpPosition.set(event.clientX, event.clientY)
-        if ( this.onDownPosition.distanceTo( this.onUpPosition ) === 0) {
+        if (this.onDownPosition.distanceTo(this.onUpPosition) === 0) {
             this.detachObject(this.moveControl.object)
         }
     }
 
     onPointerMove = (event) => {
         this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
-		this.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
-        this.raycaster.setFromCamera( this.pointer, this.camera );
-        const intersects = this.raycaster.intersectObjects( this.objects, true );
+        this.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        this.raycaster.setFromCamera(this.pointer, this.camera);
+        const intersects = this.raycaster.intersectObjects(this.objects, true);
         if (intersects.length > 0) {
-            let object = intersects[ 0 ].object
+            let object = intersects[0].object
             // object with meta is the object we built
             while (!object.meta) object = object.parent
-            if ( object !== this.moveControl.object ) {
+            if (object !== this.moveControl.object) {
                 this.currentObject = object
-                this.moveControl.attach( object );
-                this.rotateControl.attach( object );
+                this.moveControl.attach(object);
+                this.rotateControl.attach(object);
                 this.panel.setObject(this.moveControl.object)
                 this.panel.$el.style.left = (event.clientX + 50) + 'px'
                 this.panel.$el.style.top = (event.clientY - 10) + 'px'
             }
         }
-        if (this.moveControl.dragging) {
+        if (this.moveControl.dragging && this.moveControl.mode === 'translate') {
             this.panel.$el.style.left = (event.clientX + 50) + 'px'
             this.panel.$el.style.top = (event.clientY - 10) + 'px'
         }
-        
+
     }
 
     render = () => {
@@ -244,14 +288,14 @@ export default class Scene {
         let ambientLight = new THREE.AmbientLight(0x606060, 3)
         this.scene.add(ambientLight)
         let directionalLight = new THREE.DirectionalLight(0xffffff, 3)
-        directionalLight.position.set( 1, 0.75, 0.5 ).normalize()
-		this.scene.add(directionalLight)
+        directionalLight.position.set(1, 0.75, 0.5).normalize()
+        this.scene.add(directionalLight)
     }
 
     onWindowResize = () => {
         this.camera.aspect = window.innerWidth / window.innerHeight
         this.camera.updateProjectionMatrix()
-        this.renderer.setSize( window.innerWidth, window.innerHeight )
+        this.renderer.setSize(window.innerWidth, window.innerHeight)
         this.render()
     }
 

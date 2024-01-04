@@ -10,7 +10,7 @@ var fontObj = undefined // 字体文件对象
  * 基本文字
  * @returns 
  */
-async function Text({ size, text = "自定义", color = "#aabbcc" }) {
+export default async function Text({ size, text = "自定义", color = "#aabbcc" }) {
     const group = new THREE.Group()
     let width = size[0]
     let height = size[1]
