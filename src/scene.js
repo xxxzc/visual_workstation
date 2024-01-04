@@ -4,8 +4,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 
-import { generateUUID } from 'three/src/math/MathUtils.js';
-
 import MetaObject from './metaobject.js'
 import Grid from './three_helpers/grid.js'
 import Loader from './three_helpers/loader.js'
@@ -27,7 +25,9 @@ export default class Scene {
      * @param {Object[]} data.templates 
      * @param {string} mode 
      */
-    async build({ size, objects, templates }, mode = "2d") {
+    async build({ size, objects, templates }, mode = "2d") {    
+        this.dispose()
+
         this.data = arguments[0]
         this.size = size
         const width = size[0]
@@ -67,6 +67,26 @@ export default class Scene {
         orbitControl.update()
         orbitControl.addEventListener('change', this.render)
 
+        // 先加载所有模型
+        this.loader = new Loader()
+        await this.loader.loadMany(
+            objects.map(x => x.model2d).concat(objects.map(x => x.model3d))
+                .concat(templates.map(x => x.model2d)).concat(templates.map(x => x.model3d))
+        )
+
+        // 加载模板
+        this.templates = {}
+        templates.forEach((x, i) => {
+            this.templates[x.tid] = x
+        })
+
+        // 加载物体
+        objects.forEach(this.addObject)
+
+        if (mode !== 'edit') {
+            return this.render()
+        }
+
         this.raycaster = new THREE.Raycaster()
         this.pointer = new THREE.Vector2()
         this.onUpPosition = new THREE.Vector2()
@@ -79,7 +99,7 @@ export default class Scene {
         const objectControl = this.objectControl = new TransformControls(camera, renderer.domElement);
         objectControl.size = 0.4
         objectControl.showZ = false
-        objectControl.translationSnap = 0.5
+        objectControl.translationSnap = 0.25
         objectControl.rotationSnap = 0.25 / Math.PI
         objectControl.setScaleSnap(0.5)
         objectControl.space = 'local'
@@ -89,84 +109,35 @@ export default class Scene {
         })
         // objectControl.position.y += 3 
         scene.add(objectControl)
-
-        const templateControl = this.templateControl = new TransformControls(camera, renderer.domElement);
-        templateControl.size = 0.2
-        templateControl.mode = 'rotate'
-        templateControl.addEventListener('change', this.render)
-        templateControl.addEventListener('dragging-changed', (event) => {
-            orbitControl.enabled = !event.value
-        })
-        scene.add(templateControl)
-
-        // 先加载所有模型
-        this.loader = new Loader()
-        await this.loader.loadMany(
-            objects.map(x => x.model2d).concat(objects.map(x => x.model3d))
-                .concat(templates.map(x => x.model2d)).concat(templates.map(x => x.model3d))
-        )
+        this.curObject = null
 
         // 加载模板
-        this.templates = {}
         templates.forEach((x, i) => {
-            this.templates[x.tid] = x
             this.addObject(Object.assign({}, x, {
                 position: [i % 2 == 0 ? -12 : -6, height - Math.floor(i/2) * 4 - 2, 0], 
                 showLabel: true, isTemplate: true
             }))
         })
-        // 加载物体
-        objects.forEach(this.addObject)
 
-        this.curObject = null
         this.render()
-
-        window.addEventListener('keydown', (event) => {
-            console.log(event)
-            switch (event.key) {
-                case 'r':
-                    this.panel.setMode('rotate')
-                    break
-                case 's':
-                    this.panel.setMode('scale')
-                    break
-                case 't':
-                    this.panel.setMode('translate')
-                    break
-                case 'Escape':
-                    this.objectControl.reset()
-                    break
-            }
-        })
     }
 
     buildPanel = () => {
         const that = this
+        if (this.panel) return
         this.panel = new Vue({
-            el: "#panel",
+            el: "#objectPanel",
             data() {
                 return {
                     object: null,
                     mode: 'translate',
                     isTemplate: false,
+                    size: [1, 1, 1],
                     rotate: [0, 0, 0]
                 }
             },
             watch: {
                 mode(value) {
-                    if (value === 'rotate') {
-                        that.objectControl.showX = false
-                        that.objectControl.showY = false
-                        that.objectControl.showZ = true
-                    } else if (value === 'scale') {
-                        that.objectControl.showX = true
-                        that.objectControl.showY = true
-                        that.objectControl.showZ = false
-                    } else {
-                        that.objectControl.showZ = false
-                        that.objectControl.showX = true
-                        that.objectControl.showY = true
-                    }
                     that.objectControl.mode = value
                 }
             },
@@ -175,6 +146,7 @@ export default class Scene {
                     if (this.object === object) return
                     this.object = object
                     if (!object) return
+                    this.size = [...this.object.meta.size]
                     this.rotate = this.object.rotation.toArray().slice(0, 3).map(toDeg)
                     this.isTemplate = this.object && this.object.meta.isTemplate
                 },
@@ -204,7 +176,6 @@ export default class Scene {
                     this.object = null
                 },
                 onRotate() {
-                    // this.object.rotation.set(...this.rotate.map(toRad))
                     that.render()
                 },
                 toRad(x) {
@@ -212,18 +183,12 @@ export default class Scene {
                 },
                 toDeg(x) {
                     return Math.round(x * 180 / Math.PI)
+                },
+                onSizeChange() {
+                    
                 }
             }
         })
-    }
-
-    /**
-     * 选择展示模式
-     */
-    switchMode = (mode) => {
-        this.mode = mode
-        let objects = [...this.objects]
-        objects.forEach(this.resetObject)
     }
 
     addObject = async (meta) => {
@@ -242,8 +207,7 @@ export default class Scene {
         if (!object) return
         if (this.curObject === object) return
         this.curObject = object
-        if (object.meta.isTemplate) this.templateControl.attach(object)
-        else this.objectControl.attach(object)
+        if (!object.meta.isTemplate) this.objectControl.attach(object)
         this.panel.setObject(object)
         this.render()
     }
@@ -252,9 +216,6 @@ export default class Scene {
         if (!object) return
         if (this.objectControl.object === object) {
             this.objectControl.detach();
-        }
-        if (this.templateControl.object === object) {
-            this.templateControl.detach();
         }
         this.curObject = null
         this.panel.setObject(null)
@@ -284,14 +245,13 @@ export default class Scene {
     onPointerDown = (event) => {
         if (event.target.tagName !== 'CANVAS') return
         this.onDownPosition.set(event.clientX, event.clientY)
-        if (this.curObject) console.log(this.curObject)
     }
 
     onPointerUp = (event) => {
         if (event.target.tagName !== 'CANVAS') return
         this.onUpPosition.set(event.clientX, event.clientY)
         if (this.onDownPosition.distanceTo(this.onUpPosition) === 0) {
-            this.detachObject(this.objectControl.object)
+            this.detachObject(this.curObject)
         }
     }
 
@@ -309,14 +269,14 @@ export default class Scene {
                 while (!object.meta && cnt--) object = object.parent
                 return object
             })
-            if (objects[0] !== this.curObject && !this.objectControl.dragging && !this.templateControl.dragging) {
+            if (objects[0] !== this.curObject && !this.objectControl.dragging) {
                 this.attachObject(objects[0])
-                this.panel.$el.style.left = (event.clientX + 50) + 'px'
+                this.panel.$el.style.left = (event.clientX + 30) + 'px'
                 this.panel.$el.style.top = (event.clientY - 15) + 'px'
             }
         }
         if (this.objectControl.dragging && this.objectControl.mode === 'translate') {
-            this.panel.$el.style.left = (event.clientX + 50) + 'px'
+            this.panel.$el.style.left = (event.clientX + 30) + 'px'
             this.panel.$el.style.top = (event.clientY - 15) + 'px'
         }
 
@@ -360,5 +320,14 @@ export default class Scene {
             method: "POST",
             body: JSON.stringify(this.data)
         })
-    }   
+    }
+
+    dispose = () => {
+        if (this.renderer) {
+            this.scene.clear()
+            this.panel.setObject(null)
+            this.renderer.domElement.remove()
+            this.renderer.dispose()
+        }
+    }
 }

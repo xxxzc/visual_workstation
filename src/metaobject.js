@@ -43,6 +43,9 @@ export default class MetaObject {
         this.position = t.position // 物体位置
 
         this.isTemplate = t.isTemplate || false // 是否为模板
+
+        /** @type {THREE.Object3D}  */
+        this.object3d
     }
 
     toJson = () => {
@@ -69,56 +72,83 @@ export default class MetaObject {
 
     /**
      * 构建 Object3D 对象
+     * Group [
+     * Box, // 碰撞体积
+     * Text, Model2D, Model3D
+     * ]
+     * 
      * @param {string} mode 模式 edit/2d/3d
      * @param {Loader} loader 
+     * @returns {THREE.Group}
      */
     build = async (mode, loader) => {
         let group = new THREE.Group()
 
-        let model
-        if (mode === '2d' || !this.model3d) {
-            this._model2d = await loader.load(this.model2d)
-            model = this.#build2d()
-        } else {
-            this._model3d = await loader.load(this.model3d)
-            model = this.#build3d()
+        let _model2d = await loader.load(this.model2d)
+        let _model3d = await loader.load(this.model3d)
+
+        // 碰撞体积
+        let box = this.#buildBox()
+        if (mode === 'edit') {
+            // 编辑模式，必显示碰撞体积
+            box.visible = true
+        } else if (mode === '2d' && _model2d) {
+            // 有 2d 模型
+            box.visible = false
+        } else if (mode === '3d' && (_model3d || _model2d)) {
+            box.visible = false
         }
-        group.add(model)
+
+        group.add(box)
+
+        let text = this.#buildText(await loader.loadFont())
+        text.visible = box.visible && this.showLabel
+        group.add(text)
+
+        if (_model2d && (mode === '2d' || !_model3d)) {
+            let model2d = this.#build2d(_model2d)
+            group.add(model2d)
+        }
+
+        if (_model3d && mode !== '2d') {
+            let model3d = this.#build3d(_model3d)
+            group.add(model3d)
+        }
 
         if (this.rotate) group.rotation.set(...this.rotate.map(toRad))
 
-        if (mode === '2d' || !this._model3d) {
-            if (this.showLabel) {
-                let _group = group
-                let text = new THREE.Mesh(
-                    new TextGeometry(this.label, {
-                        font: await loader.loadFont(), size: 0.6, height: 0.1
-                    }), new THREE.MeshBasicMaterial({ color: 0x666666 })
-                )
-                text.position.set(-0.5, -0.1, 0)
-                group = new THREE.Group()
-                group.add(_group)
-                group.add(text)
-            }
-        }
         group.position.set(...this.position)
         group.meta = this
+
+        this.object3d = group
         return group
     }
 
-    #build2d = () => {
-        if (!this._model2d) {
-            const geometry = new THREE.BoxGeometry(...this.size)
-            const material = new THREE.MeshBasicMaterial({ color: this.color || 0x888888, opacity: 0.5, transparent: true })
-            let mesh = new THREE.Mesh(geometry, material)
-            return mesh
-        }
+    #buildBox = () => {
+        const geometry = new THREE.BoxGeometry(...this.size)
+        const material = new THREE.MeshBasicMaterial({ color: this.color || 0x888888, opacity: 0.5, transparent: true })
+        let mesh = new THREE.Mesh(geometry, material)
+        return mesh
     }
 
-    #build3d = () => {
-        if (!this._model3d) return this.#build2d()
+    #buildText = (font) => {
+        let text = new THREE.Mesh(
+            new TextGeometry(this.label, {
+                font, size: 0.6, height: 0.1
+            }), new THREE.MeshBasicMaterial({ color: 0x666666 })
+        )
+        text.position.set(-0.5, -0.1, 0)
+        return text
+    }
 
-        let model = this._model3d
+    #build2d = (model) => {
+        if (!model) return null
+        return null
+    }
+
+    #build3d = (model) => {
+        if (!model) return null
+
         /** @type {THREE.Object3D} */
         let object = model.scene.clone()
 
@@ -126,7 +156,7 @@ export default class MetaObject {
         // shrink to size
         let box = new THREE.Box3().setFromObject(object)
         let size = box.max.sub(box.min)
-        object.scale.multiplyScalar(Math.min(this.size[0], this.size[1]) / Math.max(size.x, size.y) * 0.95)
+        object.scale.multiplyScalar(Math.min(this.size[0], this.size[1]) / Math.max(size.x, size.y) * 0.98)
 
         return object
     }

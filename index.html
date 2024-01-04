@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>My first three.js app</title>
+    <title>工位可视化</title>
     <style>
         body {
             margin: 0;
@@ -20,7 +20,7 @@
             align-items: center;
         }
 
-        #panel {
+        #objectPanel {
             position: absolute;
             z-index: 98;
             top: 10px;
@@ -36,7 +36,7 @@
         }
 
         .space {
-            margin: 6px 0;
+            margin: 8px 0;
         }
 
         [v-cloak] {
@@ -48,22 +48,24 @@
 
 <body>
     <div id="globalControl" v-cloak>
-        <a-button type="primary" title="提交修改" shape="circle" icon="save" size="large">
-        </a-button>
-        <a-radio-group v-model:value="mode" size="small">
+        <a-radio-group v-model:value="mode">
             <a-radio-button value="2d">2D</a-radio-button>
             <a-radio-button value="3d">3D</a-radio-button>
+            <a-radio-button value="edit">编辑</a-radio-button>
         </a-radio-group>
+        <a-button type="primary" title="提交修改" shape="circle" icon="save" size="large">
+        </a-button>
     </div>
-    <div id="panel" v-cloak>
+    <div id="objectPanel" v-cloak>
         <div class="card" v-if="object">
-            <div class="space" v-if="!isTemplate">
-                <a-radio-group v-model:value="mode" size="small">
-                    <a-radio-button value="translate">移动(t)</a-radio-button>
-                    <a-radio-button value="rotate">旋转(r)</a-radio-button>
-                    <a-radio-button value="scale">大小(s)</a-radio-button>
-                </a-radio-group>
+            <div class="space">
+            <a-button size="small" @click="onCopy">复制</a-button>
             </div>
+            <!-- <div class="space" v-if="!isTemplate">
+                <a-radio-group v-model:value="mode" size="small">
+                    <a-radio-button value="translate">移动</a-radio-button>
+                </a-radio-group>
+            </div> -->
             <div class="space" hidden>
                 主键 <a-input placeholder="id" v-model="object.meta.id" size="small" />
             </div>
@@ -74,16 +76,19 @@
                 名称 <a-input v-model="object.meta.label" size="small" />
             </div>
             <div class="space">
+                大小 
+                <a-input-number v-model="size[0]" @change="onSizeChange"></a-input-number>
+                <a-input-number v-model="size[1]" @change="onSizeChange"></a-input-number>
+            </div>
+            <div v-if="!isTemplate" class="space">
+                <!-- 对于物体，只旋转 z 轴 -->
                 旋转 
-                <a-input-number v-model="object.rotation.x" :min="0" :max="100" @change="onRotate"></a-input-number>
-                <a-input-number v-model="object.rotation.y" :min="0" :max="100" @change="onRotate"></a-input-number>
                 <a-input-number v-model="object.rotation.z" :formatter="toDeg" :parser="toRad" :min="0" :max="100" @change="onRotate"></a-input-number>
             </div>
             <div class="space" style="margin-top: 20px;">
                 <a-button size="small" @click="onSave">保存</a-button>
                 <a-button size="small" @click="onReset">重置</a-button>
                 <a-button size="small" @click="onDelete">删除</a-button>
-                <a-button size="small" @click="onCopy">复制</a-button>
             </div>
         </div>
     </div>
