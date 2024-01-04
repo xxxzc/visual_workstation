@@ -57,7 +57,7 @@
     </div>
     <div id="panel" v-cloak>
         <div class="card" v-if="object">
-            <div class="space">
+            <div class="space" v-if="!isTemplate">
                 <a-radio-group v-model:value="mode" size="small">
                     <a-radio-button value="translate">移动(t)</a-radio-button>
                     <a-radio-button value="rotate">旋转(r)</a-radio-button>
@@ -68,10 +68,16 @@
                 主键 <a-input placeholder="id" v-model="object.meta.id" size="small" />
             </div>
             <div class="space">
-                类型 <a-input v-model="object.meta.name" size="small" />
+                类型 <a-input v-model="object.meta.name" size="small"></a-input>
             </div>
             <div class="space">
-                编号 <a-input v-model="object.meta.label" size="small" />
+                名称 <a-input v-model="object.meta.label" size="small" />
+            </div>
+            <div class="space">
+                旋转 
+                <a-input-number v-model="object.rotation.x" :min="0" :max="100" @change="onRotate"></a-input-number>
+                <a-input-number v-model="object.rotation.y" :min="0" :max="100" @change="onRotate"></a-input-number>
+                <a-input-number v-model="object.rotation.z" :formatter="toDeg" :parser="toRad" :min="0" :max="100" @change="onRotate"></a-input-number>
             </div>
             <div class="space" style="margin-top: 20px;">
                 <a-button size="small" @click="onSave">保存</a-button>

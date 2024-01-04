@@ -1,8 +1,8 @@
 import * as THREE from 'three'
 
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
+import { generateUUID } from 'three/src/math/MathUtils.js';
 
-import Text from './three_helpers/text'
 import Loader from './three_helpers/loader'
 
 function toVec(a) {
@@ -14,7 +14,7 @@ function toRad(x) {
 }
 
 function toDeg(x) {
-    return Math.round(x / Math.PI * 180)
+    return Math.round(x * 180 / Math.PI)
 }
 
 export default class MetaObject {
@@ -37,10 +37,12 @@ export default class MetaObject {
         this.rotate3d = t.rotate3d || null // 立体模型旋转角度
 
         this.rotate = t.rotate || null // 物体旋转角度
-        this.scale = t.scale || [1, 1, 1]
+        this.size = t.size || [1, 1, 1]
 
-        this.id = t.id // 物体 id
+        this.id = t.id || generateUUID() // 物体 id
         this.position = t.position // 物体位置
+
+        this.isTemplate = t.isTemplate || false // 是否为模板
     }
 
     toJson = () => {
@@ -49,7 +51,7 @@ export default class MetaObject {
             tid: this.tid, name: this.name, label: this.label, showLabel: this.showLabel,
             model2d: this.model2d, rotate2d: this.rotate2d, color: this.color,
             model3d: this.model3d, rotate3d: this.rotate3d,
-            rotate: this.rotate, scale: this.scale,
+            rotate: this.rotate, size: this.size,
             id: this.id, position: this.position,
         }
     }
@@ -62,40 +64,42 @@ export default class MetaObject {
     update = (object) => {
         this.position = object.position.toArray()
         this.rotate = object.rotation.toArray().slice(0, 3).map(toDeg)
-        this.scale = object.scale.toArray()
+        this.size = object.scale.toArray()
     }
 
     /**
-     * 
-     * @param {string} mode
+     * 构建 Object3D 对象
+     * @param {string} mode 模式 edit/2d/3d
      * @param {Loader} loader 
      */
     build = async (mode, loader) => {
         let group = new THREE.Group()
+
+        let model
         if (mode === '2d' || !this.model3d) {
             this._model2d = await loader.load(this.model2d)
-            group.add(this.#build2d())
+            model = this.#build2d()
         } else {
             this._model3d = await loader.load(this.model3d)
-            group.add(this.#build3d())
+            model = this.#build3d()
         }
+        group.add(model)
 
         if (this.rotate) group.rotation.set(...this.rotate.map(toRad))
-        // group.scale.set(...this.scale)
-        if (mode === '2d' || !this._model3d) {
-            group.scale.set(...this.scale)
-            if (this.showLabel) {
-                group.add(
-                    new THREE.Mesh(
-                        new TextGeometry(this.label, {
-                            font: await loader.loadFont(), size: 0.1, height: 0.1
-                        }), new THREE.MeshBasicMaterial({ color: 0x000000 })
-                    )
-                )
-            }
 
-        } else if (mode === '3d') {
-            group.scale.multiplyScalar(this.scale[0])
+        if (mode === '2d' || !this._model3d) {
+            if (this.showLabel) {
+                let _group = group
+                let text = new THREE.Mesh(
+                    new TextGeometry(this.label, {
+                        font: await loader.loadFont(), size: 0.6, height: 0.1
+                    }), new THREE.MeshBasicMaterial({ color: 0x666666 })
+                )
+                text.position.set(-0.5, -0.1, 0)
+                group = new THREE.Group()
+                group.add(_group)
+                group.add(text)
+            }
         }
         group.position.set(...this.position)
         group.meta = this
@@ -104,9 +108,10 @@ export default class MetaObject {
 
     #build2d = () => {
         if (!this._model2d) {
-            const geometry = new THREE.BoxGeometry(1, 1, 1)
-            const material = new THREE.MeshBasicMaterial({ color: this.color || 0xff0000, opacity: 0.5, transparent: true })
-            return new THREE.Mesh(geometry, material)
+            const geometry = new THREE.BoxGeometry(...this.size)
+            const material = new THREE.MeshBasicMaterial({ color: this.color || 0x888888, opacity: 0.5, transparent: true })
+            let mesh = new THREE.Mesh(geometry, material)
+            return mesh
         }
     }
 
@@ -114,14 +119,14 @@ export default class MetaObject {
         if (!this._model3d) return this.#build2d()
 
         let model = this._model3d
-
         /** @type {THREE.Object3D} */
         let object = model.scene.clone()
+
         if (this.rotate3d) object.rotation.set(...this.rotate3d.map(toRad))
         // shrink to size
         let box = new THREE.Box3().setFromObject(object)
         let size = box.max.sub(box.min)
-        object.scale.multiplyScalar(1 / Math.max(size.x, size.y))
+        object.scale.multiplyScalar(Math.min(this.size[0], this.size[1]) / Math.max(size.x, size.y) * 0.95)
 
         return object
     }
