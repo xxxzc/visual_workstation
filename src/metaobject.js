@@ -40,34 +40,38 @@ export default class MetaObject {
         this.size = t.size || [1, 1, 1]
 
         this.id = t.id || generateUUID() // 物体 id
-        this.position = t.position // 物体位置
 
         this.isTemplate = t.isTemplate || false // 是否为模板
 
         /** @type {THREE.Object3D}  */
-        this.object3d
+        this.group = new THREE.Group() // 物体组
+        this.group.meta = this
+
+        this.group.position.set(...(t.position || [0, 0, 0]))
+        /** @type {THREE.Vector3} */
+        this.position = this.group.position
+    }
+
+    toTemplate = () => {
+        return {
+            category: this.category, tid: this.tid, tname: this.tname, 
+            showLabel: this.showLabel,
+            model2d: this.model2d, rotate2d: this.rotate2d,
+            model3d: this.model3d, rotate3d: this.rotate3d,
+            color: this.color, size: this.size,
+            isTemplate: this.isTemplate
+        }
     }
 
     toJson = () => {
         return {
-            category: this.category,
-            tid: this.tid, tname: this.tname, name: this.name, showLabel: this.showLabel,
-            model2d: this.model2d, rotate2d: this.rotate2d, color: this.color,
-            model3d: this.model3d, rotate3d: this.rotate3d,
-            rotate: this.rotate, size: this.size,
-            id: this.id, position: this.position,
+            category: this.category, tid: this.tid, tname: this.tname, 
+            name: this.name, showLabel: this.showLabel,
+            model2d: this.model2d, model3d: this.model3d,
+            color: this.color, size: this.size, rotate: this.rotate,
+            id: this.id, position: [...this.position.toArray()],
+            isTemplate: this.isTemplate
         }
-    }
-
-    /**
-     * 根据 Object3d 更新元数据
-     * @param {THREE.Object3D} object 
-     * @returns 
-     */
-    update = (object) => {
-        this.position = object.position.toArray()
-        this.rotate = object.rotation.toArray().slice(0, 3).map(toDeg)
-        this.size = object.scale.toArray()
     }
 
     /**
@@ -76,20 +80,23 @@ export default class MetaObject {
      * Box, // 碰撞体积
      * Text, Model2D, Model3D
      * ]
-     * 
-     * @param {string} mode 模式 edit/2d/3d
-     * @param {Loader} loader 
+     * @param {Object} ctx 
+     * @param {string} ctx.mode 模式 2d/3d
+     * @param {Loader} ctx.loader 模型加载器
+     * @param {boolean} ctx.edit 是否为编辑模式
      * @returns {THREE.Group}
      */
-    build = async (mode, loader) => {
-        let group = new THREE.Group()
+    build = async ({ mode, loader, edit=false }) => {
+        this.group.clear()
+
+        let group = this.group
 
         let _model2d = await loader.load(this.model2d)
         let _model3d = await loader.load(this.model3d)
 
         // 碰撞体积
         let box = this.#buildBox()
-        if (mode === 'edit') {
+        if (edit) {
             // 编辑模式，必显示碰撞体积
             box.visible = true
         } else if (mode === '2d' && _model2d) {
@@ -101,9 +108,10 @@ export default class MetaObject {
 
         group.add(box)
 
-        let text = this.#buildText(await loader.loadFont())
+        let text = MetaObject.buildText(this.name, await loader.loadFont(), 0.6)
         text.visible = box.visible && this.showLabel
         text.rotation.set(...this.rotate.map(x => -toRad(x)))
+        if (this.isTemplate) text.position.y -= 2
         group.add(text)
 
         if (_model2d && (mode === '2d' || !_model3d)) {
@@ -111,17 +119,14 @@ export default class MetaObject {
             group.add(model2d)
         }
 
-        if (_model3d && mode !== '2d') {
+        if (_model3d && mode === '3d') {
             let model3d = this.#build3d(_model3d)
             group.add(model3d)
         }
 
-        if (this.rotate) group.rotation.set(...this.rotate.map(toRad))
-
+        group.rotation.set(...this.rotate.map(toRad))
         group.position.set(...this.position)
-        group.meta = this
 
-        this.object3d = group
         return group
     }
 
@@ -132,10 +137,11 @@ export default class MetaObject {
         return mesh
     }
 
-    #buildText = (font) => {
+    static buildText(content, font, size) {
+        size = size || 0.6
         let text = new THREE.Mesh(
-            new TextGeometry(this.name, {
-                font, size: 0.6, height: 0.1
+            new TextGeometry(content, {
+                font, size, height: 0.1
             }), new THREE.MeshBasicMaterial({ color: 0x666666 })
         )
         text.position.set(-0.5, -0.1, 0)

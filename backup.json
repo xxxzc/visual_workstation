@@ -1,66 +1,109 @@
 {
-    "city": "上海",
-    "zone": "杨高南路",
-    "floor": "12层",
-    "height": 80,
-    "width": 80,
+    "id": "0-01-001-12",
+    "path": [
+        "上海",
+        "杨高南路",
+        "一号楼",
+        "12层"
+    ],
+    "size": [
+        50,
+        50,
+        4
+    ],
+    "ground": "",
+    "templates": [
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "工位",
+            "model2d": "",
+            "model3d": "model/Desk.glb",
+            "size": [
+                1,
+                0.5,
+                0.5
+            ],
+            "rotate3d": [
+                90,
+                180,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Room",
+            "tname": "房间",
+            "size": [
+                1,
+                1,
+                1
+            ]
+        },
+        {
+            "category": "Wall",
+            "tid": "GlassWall",
+            "tname": "玻璃墙",
+            "size": [
+                1,
+                1,
+                1
+            ]
+        },
+        {
+            "category": "Appliance",
+            "tid": "MicroWave",
+            "tname": "微波炉",
+            "size": [
+                0.4,
+                0.3,
+                0.3
+            ]
+        }
+    ],
     "objects": [
         {
             "id": "100",
-            "template": "NormalSeat",
-            "type": "Seat",
-            "name": "正常工位",
-            "width": 2,
-            "height": 1,
-            "depth": 1,
-            "x": 8,
-            "y": 31,
-            "z": 1,
-            "color": "#aabbcc",
-            "text": "A-111",
-            "model": ""
-        }
-    ],
-    "templates": [
-        {
-            "template": "NormalSeat",
-            "type": "Seat",
-            "name": "正常工位",
-            "width": 2,
-            "height": 1,
-            "depth": 1,
-            "color": "#aabbcc",
-            "text": "工位"
+            "category": "Seat",
+            "tid": "NormalSeat",
+            "tname": "工位",
+            "size": [
+                1,
+                0.5,
+                0.5
+            ],
+            "position": [
+                8,
+                31,
+                0.5
+            ],
+            "name": "A-111",
+            "model2d": "",
+            "model3d": "model/Desk.glb"
         },
         {
-            "template": "MeetingRom",
-            "type": "Room",
-            "name": "会议室",
-            "width": 7,
-            "height": 4,
-            "depth": 1,
-            "color": "#aabbcc",
-            "text": "会议室"
-        },
-        {
-            "template": "GlassWall",
-            "type": "Wall",
-            "name": "玻璃墙",
-            "width": 1,
-            "height": 1,
-            "depth": 1,
-            "color": "#aabbcc",
-            "text": "墙"
-        },
-        {
-            "template": "MicroWave",
-            "type": "Appliance",
-            "name": "微波炉",
-            "width": 2,
-            "height": 1,
-            "depth": 1,
-            "color": "#aabbcc",
-            "text": "微波炉"
+            "id": "101",
+            "category": "Seat",
+            "tid": "NormalSeat",
+            "tname": "工位",
+            "size": [
+                1,
+                0.5,
+                0.5
+            ],
+            "position": [
+                10,
+                21,
+                0.5
+            ],
+            "name": "A-111",
+            "model2d": "",
+            "model3d": "model/Desk.glb",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
         }
     ]
 }

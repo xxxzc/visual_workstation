@@ -29,14 +29,25 @@
 
         .card {
             background-color: white;
-            padding: 8px 12px;
+            padding: 16px 16px 8px 16px;
             border: 1px solid #ddd;
             border-radius: 6px;
             box-shadow: 0px 1px 8px #aaaaaaaa;
         }
 
         .space {
+            display: flex;
+            align-items: center;
             margin: 8px 0;
+        }
+
+        .form-label {
+            width: 80px;
+        }
+
+        .form-input {
+            flex: 1;
+            width: 90%;
         }
 
         [v-cloak] {
@@ -48,43 +59,72 @@
 
 <body bgcolor="#f0f0f0">
     <div id="globalControl" v-cloak>
+        <a-tooltip placement="bottomLeft" title="红色表示您有未提交的修改">
+            <a-button :type="changed ? 'danger' : 'primary'" title="提交修改" shape="circle" icon="save" size="large" @click="save"></a-button>
+        </a-tooltip>
         <a-radio-group v-model:value="mode">
-            <a-radio-button value="edit">编辑</a-radio-button>
             <a-radio-button value="2d">2D</a-radio-button>
             <a-radio-button value="3d">3D</a-radio-button>
         </a-radio-group>
-        <a-button type="primary" title="提交修改" shape="circle" icon="save" size="large">
-        </a-button>
+        <a-tooltip placement="bottomLeft" title="编辑模式，切换模式将暂存数据">
+            <a-button :type="edit ? 'primary' : ''" icon="edit" @click="changeEdit"></a-button>
+        </a-tooltip>
+        <a-tooltip v-show="edit" placement="bottomLeft" title="取消改动">
+            <a-button shape="circle" icon="undo" @click="buildScene"></a-button>
+        </a-tooltip>
     </div>
     <div id="objectPanel" v-cloak>
-        <div class="card" v-show="object">
-            <div style="display: flex; justify-content: space-between;">
-                <span>{{meta.category}} > <b>{{meta.tname}}</b></span>
-                <a-button style="margin-left: auto;" size="small" @click="onCopy">复制</a-button>
+        <div class="card" v-if="object && meta">
+            <div style="display: flex; justify-content: space-between; min-height: 32px;">
+                <span style="font-size: 18px;">{{meta.category}} > <b>{{meta.tname}}</b></span>
+                <div v-if="edit">
+                    <a-button type="primary" @click="newObject">新增物体</a-button>
+                    <a-button type="primary" @click="newTemplate">新增模板</a-button>
+                    <a-button icon="delete" @click="onDelete"></a-button>
+                </div>
             </div>
             <div><b>物体信息</b></div>
             <div class="space" hidden>
                 <span>主键</span> <a-input placeholder="id" v-model="meta.id" size="small" />
             </div>
             <div class="space">
-                <span>名称</span> <a-input v-model="meta.name" size="small" />
+                <div class="form-label">名称</div>
+                <div class="form-input">
+                <a-input :disabled="!edit" v-model="meta.name" size="small" @change="applyChange" />
+                </div> 
             </div>
-            <div><b>物体调整</b></div>
+            <div v-if="edit"><div><b>物体调整</b></div>
             <div class="space">
-                <div>大小</div>
+                <div class="form-label">大小(m)</div>
+                <div class="form-input">
                 <a-input-number v-model="meta.size[0]" @change="applyChange" size="small"></a-input-number>
                 <a-input-number v-model="meta.size[1]" @change="applyChange" size="small"></a-input-number>
-                <a-input-number v-model="meta.size[1]" @change="applyChange" size="small"></a-input-number>
+                <a-input-number v-model="meta.size[2]" @change="applyChange" size="small"></a-input-number>
+                </div>
             </div>
             <div v-if="!meta.isTemplate" class="space">
                 <!-- 对于物体，只旋转 z 轴 -->
-                <span>旋转</span>
-                <a-slider v-model="meta.rotate[2]" :step="15" :max="360" />
+                <div class="form-label">旋转整体</div>
+                <div class="form-input">
+                    <a-slider class="form-input" v-model="meta.rotate[2]" :step="15" :max="360" @change="applyChange" />
+                </div>
             </div>
-            <div class="space" style="margin-top: 20px; text-align: right;">
-                <a-button size="small" @click="onSave">保存</a-button>
-                <a-button size="small" @click="onReset">重置</a-button>
-                <a-button size="small" @click="onDelete">删除</a-button>
+            <div v-if="meta.isTemplate" class="space">
+                <div class="form-label">旋转2d模型</div>
+                <div class="form-input">
+                    <a-input-number v-model="meta.rotate2d[0]" @change="applyChange" size="small"></a-input-number>
+                    <a-input-number v-model="meta.rotate2d[1]" @change="applyChange" size="small"></a-input-number>
+                    <a-input-number v-model="meta.rotate2d[2]" @change="applyChange" size="small"></a-input-number>
+                </div>
+            </div>
+            <div v-if="meta.isTemplate" class="space">
+                <div class="form-label">旋转3d模型</div>
+                <div class="form-input">
+                    <a-input-number v-model="meta.rotate3d[0]" @change="applyChange" size="small"></a-input-number>
+                    <a-input-number v-model="meta.rotate3d[1]" @change="applyChange" size="small"></a-input-number>
+                    <a-input-number v-model="meta.rotate3d[2]" @change="applyChange" size="small"></a-input-number>
+                </div>
+            </div>
             </div>
         </div>
     </div>
