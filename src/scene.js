@@ -46,7 +46,7 @@ export default class Scene {
 
         this.objectControl = new TransformControls(this.camera, this.renderer.domElement)
         const objectControl = this.objectControl
-        objectControl.size = 0.4
+        objectControl.size = 0.3
         objectControl.showZ = false
         objectControl.translationSnap = 0.25
         objectControl.rotationSnap = 0.25 / Math.PI
@@ -216,7 +216,8 @@ export default class Scene {
         })
 
         scene.remove(this.templateTitle)
-        this.templateTitle = MetaObject.buildText("模板列表", await this.loader.loadFont(), 1)
+        this.templateTitle = MetaObject.buildText("模板列表",
+            await this.loader.loadFont(), 1, 0x333333)
         this.templateTitle.position.set(-13, height - 3, 0)
         if (edit) scene.add(this.templateTitle)
 
@@ -246,7 +247,7 @@ export default class Scene {
         }
         this.templates[meta.tid] = JSON.parse(JSON.stringify(meta))
         let object = await this.addObject(Object.assign({}, meta, {
-            position: [i % 2 == 0 ? -12 : -6, this.size[1] - Math.floor(i / 2) * 5 - 6, 0],
+            position: [i % 2 == 0 ? -11 : -6, this.size[1] - Math.floor(i / 2) * 5 - 6, 0],
             isTemplate: true
         }))
         this.render()
@@ -303,31 +304,46 @@ export default class Scene {
     onPointerMove = (event) => {
         if (event.target.tagName !== 'CANVAS') return
         this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
-        this.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
-        this.raycaster.setFromCamera(this.pointer, this.camera);
+        this.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1
+        this.raycaster.setFromCamera(this.pointer, this.camera)
+
+        let distance = 0
+        if (this.curObject) {
+            let p2 = this.curObject.position.clone().project(this.camera)
+            distance = this.pointer.distanceTo(p2)
+            // 当指针远离 object 时，自动取消控制
+            if (this.pointer.distanceTo(p2) > 0.20) {
+                this.detachObject(this.curObject)
+            }
+        }
 
         const intersects = this.raycaster.intersectObjects(this.objects, true);
         if (intersects.length > 0) {
-            let objects = intersects.map(x => {
+            // 重叠时，选择面积最小的
+            let selectObject = null
+            let size = this.size[0] * this.size[1]
+            intersects.forEach(x => {
                 let object = x.object
                 let cnt = 10
                 while (!object.meta && cnt--) object = object.parent
-                return object
+                if (cnt > 0 && object.meta.size[0] * object.meta.size[1] < size) {
+                    size = object.meta.size[0] * object.meta.size[1]
+                    selectObject = object
+                }
             })
-            if (objects[0] !== this.curObject && !this.objectControl.dragging) {
-                this.attachObject(objects[0])
+            /**
+             * 只有当物体没有被控制且指针已经远离当前物体时，
+             * 才会更换控制的物体
+             */
+            if (selectObject && selectObject !== this.curObject
+                && !this.objectControl.dragging
+                && (!this.curObject || distance > 0.05)) {
+                this.attachObject(selectObject)
                 this.movePanel()
             }
         }
         if (this.objectControl.dragging && this.objectControl.mode === 'translate') {
             this.movePanel()
-        }
-        // 当前指针移出一定范围时，隐藏选择的 object
-        if (this.curObject) {
-            let p2 = this.curObject.position.clone().project(this.camera)
-            if (this.pointer.distanceTo(p2) > 0.25) {
-                this.detachObject(this.curObject)
-            }
         }
     }
 

@@ -125,38 +125,47 @@ export default class MetaObject {
 
         group.scale.set(1, 1, 1)
         group.rotation.set(...this.rotate.map(toRad))
-        group.position.set(...this.position)
+        this.position.z = 0 // 不考虑 z 轴，默认所有都落地
+        group.position.set(this.position.x, this.position.y, 0)
 
+        var rect = null
         if (this.isTemplate) {
             // 模板只有在编辑模式才显示
             this.group.visible = edit
             // 将文本置于模型底部
-            text.position.set(-0.5, -2, 0)
+            text.position.set(-1.8, -2.3, 0)
             // 限制模型大小到 2 以下
+            rect = MetaObject.buildRect(4.5, 4.5, 0x444460)
+            rect.position.y -= 0.5
             if (maxLen > 2) {
                 group.scale.multiplyScalar(2 / maxLen)
                 text.scale.multiplyScalar(maxLen / 2)
                 text.position.multiplyScalar(maxLen / 2)
+                rect.scale.multiplyScalar(maxLen / 2)
+                rect.position.multiplyScalar(maxLen / 2)
             }
-        }
 
+            group.add(rect)
+        }
         return group
     }
 
     #buildBox = () => {
+        // return MetaObject.buildRect(this.size[0], this.size[1], this.color || 0x33aaff)
         const geometry = new THREE.BoxGeometry(...this.size)
         const material = new THREE.MeshBasicMaterial({ color: this.color || 0x888888, opacity: 0.5, transparent: true })
         let mesh = new THREE.Mesh(geometry, material)
-        mesh.position.z += this.size[2] / 2
+        mesh.position.z = this.size[2] / 2
         return mesh
     }
 
-    static buildText(content, font, size) {
-        size = size || 0.6
+    static buildText(content, font, size, color) {
+        size = size || 0.5
+        color = color || 0x666666
         let text = new THREE.Mesh(
             new TextGeometry(content, {
                 font, size, height: 0.1
-            }), new THREE.MeshBasicMaterial({ color: 0x666666 })
+            }), new THREE.MeshBasicMaterial({ color })
         )
         text.position.set(-0.5, -0.1, 0)
         return text
@@ -167,11 +176,11 @@ export default class MetaObject {
             color: color
         });
         const points = [];
-        points.push(new THREE.Vector3(0, 0, 0));
-        points.push(new THREE.Vector3(0, height, 0));
-        points.push(new THREE.Vector3(width, height, 0));
-        points.push(new THREE.Vector3(width, 0, 0));
-        points.push(new THREE.Vector3(0, 0, 0));
+        points.push(new THREE.Vector3(-width / 2, -height / 2, 0));
+        points.push(new THREE.Vector3(-width / 2, height / 2, 0));
+        points.push(new THREE.Vector3(width / 2, height / 2, 0));
+        points.push(new THREE.Vector3(width / 2, -height / 2, 0));
+        points.push(new THREE.Vector3(-width / 2, -height / 2, 0));
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const line = new THREE.Line(geometry, material);
         return line
@@ -192,8 +201,9 @@ export default class MetaObject {
         // shrink to size
         let box = new THREE.Box3().setFromObject(object)
         let size = box.max.sub(box.min)
-        object.scale.multiplyScalar(Math.min(this.size[0], this.size[1]) / Math.max(size.x, size.y) * 0.98)
-
+        const scalar = Math.min(this.size[0], this.size[1]) / Math.max(size.x, size.y)
+        object.scale.multiplyScalar(scalar)
+        object.position.z = size.z / 2 * scalar
         return object
     }
 }
