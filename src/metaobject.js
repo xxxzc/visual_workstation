@@ -54,7 +54,7 @@ export default class MetaObject {
 
     toTemplate = () => {
         return {
-            category: this.category, tid: this.tid, tname: this.tname, 
+            category: this.category, tid: this.tid, tname: this.tname,
             showLabel: this.showLabel,
             model2d: this.model2d, rotate2d: this.rotate2d,
             model3d: this.model3d, rotate3d: this.rotate3d,
@@ -64,14 +64,12 @@ export default class MetaObject {
     }
 
     toJson = () => {
-        return {
-            category: this.category, tid: this.tid, tname: this.tname, 
-            name: this.name, showLabel: this.showLabel,
-            model2d: this.model2d, model3d: this.model3d,
-            color: this.color, size: this.size, rotate: this.rotate,
-            id: this.id, position: [...this.position.toArray()],
-            isTemplate: this.isTemplate
-        }
+        return Object.assign({}, this.toTemplate(), {
+            id: this.id, name: this.name,
+            position: [...this.position.toArray()],
+            rotate: this.rotate,
+            isTemplate: false
+        })
     }
 
     /**
@@ -86,13 +84,15 @@ export default class MetaObject {
      * @param {boolean} ctx.edit 是否为编辑模式
      * @returns {THREE.Group}
      */
-    build = async ({ mode, loader, edit=false }) => {
+    build = async ({ mode, loader, edit = false }) => {
         this.group.clear()
 
         let group = this.group
 
         let _model2d = await loader.load(this.model2d)
         let _model3d = await loader.load(this.model3d)
+
+        const maxLen = Math.max(this.size[0], this.size[1])
 
         // 碰撞体积
         let box = this.#buildBox()
@@ -109,9 +109,8 @@ export default class MetaObject {
         group.add(box)
 
         let text = MetaObject.buildText(this.name, await loader.loadFont(), 0.6)
-        text.visible = box.visible && this.showLabel
+        text.visible = box.visible && (this.showLabel || this.isTemplate)
         text.rotation.set(...this.rotate.map(x => -toRad(x)))
-        if (this.isTemplate) text.position.y -= 2
         group.add(text)
 
         if (_model2d && (mode === '2d' || !_model3d)) {
@@ -124,8 +123,22 @@ export default class MetaObject {
             group.add(model3d)
         }
 
+        group.scale.set(1, 1, 1)
         group.rotation.set(...this.rotate.map(toRad))
         group.position.set(...this.position)
+
+        if (this.isTemplate) {
+            // 模板只有在编辑模式才显示
+            this.group.visible = edit
+            // 将文本置于模型底部
+            text.position.set(-0.5, -2, 0)
+            // 限制模型大小到 2 以下
+            if (maxLen > 2) {
+                group.scale.multiplyScalar(2 / maxLen)
+                text.scale.multiplyScalar(maxLen / 2)
+                text.position.multiplyScalar(maxLen / 2)
+            }
+        }
 
         return group
     }
@@ -134,6 +147,7 @@ export default class MetaObject {
         const geometry = new THREE.BoxGeometry(...this.size)
         const material = new THREE.MeshBasicMaterial({ color: this.color || 0x888888, opacity: 0.5, transparent: true })
         let mesh = new THREE.Mesh(geometry, material)
+        mesh.position.z += this.size[2] / 2
         return mesh
     }
 
@@ -146,6 +160,21 @@ export default class MetaObject {
         )
         text.position.set(-0.5, -0.1, 0)
         return text
+    }
+
+    static buildRect(width, height, color) {
+        const material = new THREE.LineBasicMaterial({
+            color: color
+        });
+        const points = [];
+        points.push(new THREE.Vector3(0, 0, 0));
+        points.push(new THREE.Vector3(0, height, 0));
+        points.push(new THREE.Vector3(width, height, 0));
+        points.push(new THREE.Vector3(width, 0, 0));
+        points.push(new THREE.Vector3(0, 0, 0));
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const line = new THREE.Line(geometry, material);
+        return line
     }
 
     #build2d = (model) => {

@@ -38,7 +38,6 @@ export default class Loader {
 
     load = async (url, loader) => {
         if (!url) return
-        if (url.endsWith('json')) console.log(url in this.objects)
         if (url in this.objects) return this.objects[url]
         if (!loader) {
             loader = this.getLoader(url)

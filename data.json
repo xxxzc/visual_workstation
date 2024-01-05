@@ -17,7 +17,7 @@
             "category": "Seat",
             "tid": "Seat",
             "tname": "\u5de5\u4f4d",
-            "showLabel": true,
+            "showLabel": false,
             "model2d": "",
             "rotate2d": [
                 0,
@@ -63,7 +63,7 @@
             "category": "Wall",
             "tid": "GlassWall",
             "tname": "\u73bb\u7483\u5899",
-            "showLabel": true,
+            "showLabel": false,
             "rotate2d": [
                 0,
                 0,
@@ -76,7 +76,7 @@
             ],
             "size": [
                 1,
-                1,
+                5,
                 1
             ],
             "isTemplate": true
@@ -109,53 +109,179 @@
             "category": "Seat",
             "tid": "Seat",
             "tname": "\u5de5\u4f4d",
-            "name": "A-111",
             "showLabel": false,
             "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
             "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
             "size": [
                 1,
                 1,
                 1
             ],
-            "rotate": [
-                0,
-                0,
-                180
-            ],
+            "isTemplate": false,
             "id": "101",
-            "position": [
-                17.500000000000004,
-                30.499999999999996,
-                0.5
-            ],
-            "isTemplate": false
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
             "name": "A-111",
-            "showLabel": false,
-            "model2d": "",
-            "model3d": "model/Desk.glb",
-            "size": [
-                1,
-                1,
-                1
+            "position": [
+                8.5,
+                30.5,
+                0.5
             ],
             "rotate": [
                 0,
                 0,
                 0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
             ],
-            "id": "100",
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "size": [
+                1,
+                1,
+                1
+            ],
+            "isTemplate": false,
+            "id": "0d193571-c855-426e-be55-f2c0e96281db",
+            "name": "A-111",
             "position": [
-                12.5,
+                9.5,
                 30.5,
                 0.5
             ],
-            "isTemplate": false
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "size": [
+                1,
+                1,
+                1
+            ],
+            "isTemplate": false,
+            "id": "1d2cbfe9-625b-49d2-a347-79a9ff6b0084",
+            "name": "A-111",
+            "position": [
+                10.5,
+                30.5,
+                0.5
+            ],
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "size": [
+                1,
+                1,
+                1
+            ],
+            "isTemplate": false,
+            "id": "5d0c1679-9437-4861-9e25-74d73446d9ac",
+            "name": "A-111",
+            "position": [
+                11.5,
+                30.5,
+                0.5
+            ],
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Room",
+            "tname": "\u623f\u95f4",
+            "showLabel": true,
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "size": [
+                3,
+                5,
+                1
+            ],
+            "isTemplate": false,
+            "id": "b37c7389-2b96-4be3-b94a-5456805e2ff5",
+            "name": "\u623f\u95f4",
+            "position": [
+                14.5,
+                45.5,
+                0
+            ],
+            "rotate": [
+                0,
+                0,
+                0
+            ]
         }
     ]
 }

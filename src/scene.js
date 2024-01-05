@@ -26,7 +26,7 @@ export default class Scene {
         this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
         this.scene = new THREE.Scene()
         this.scene.background = new THREE.Color(0xf0f0f0)
-        
+
         this.buildLight() // 灯光
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -45,12 +45,18 @@ export default class Scene {
         window.addEventListener('resize', this.onWindowResize)
 
         this.objectControl = new TransformControls(this.camera, this.renderer.domElement)
-        this.objectControl.addEventListener('change', this.render)
-        this.objectControl.addEventListener('dragging-changed', (event) => {
+        const objectControl = this.objectControl
+        objectControl.size = 0.4
+        objectControl.showZ = false
+        objectControl.translationSnap = 0.25
+        objectControl.rotationSnap = 0.25 / Math.PI
+        objectControl.setScaleSnap(0.5)
+        objectControl.space = 'local'
+        objectControl.addEventListener('change', this.render)
+        objectControl.addEventListener('dragging-changed', (event) => {
             this.orbitControl.enabled = !event.value
         })
-
-        this.objectControl.addEventListener('mouseUp', (event) => {
+        objectControl.addEventListener('mouseUp', (event) => {
             this.didChange()
         })
 
@@ -87,7 +93,7 @@ export default class Scene {
                     that.didChange()
                     let meta = this.meta.toJson()
                     meta.position = this.object.position.toArray()
-                    meta.position[0] += 2
+                    meta.position[0] += this.meta.isTemplate ? 4 : this.meta.size[0]
                     meta.id = ''
                     meta.isTemplate = false
                     that.detachObject(this.object)
@@ -113,6 +119,7 @@ export default class Scene {
     }
 
     /**
+     * 当数据变化时调用
      * @param {Object} data
      * @param {number[]} data.size 
      * @param {Object[]} data.objects
@@ -131,28 +138,14 @@ export default class Scene {
         this.edit = edit // 编辑模式
         this.panel.edit = edit
         this.didChange = didChange // 场景变化回调函数
- 
+
         this.camera.position.set(width / 3, height / 2, width * 1.3)
-        
-        const scene = this.scene
-
-        // 网格线
-        scene.remove(this.grid)
-        const grid = this.grid = new Grid(width, height, {})
-        if (edit) scene.add(grid)
-
-        // 平面
-        scene.remove(this.plane)
-        const geometry = new THREE.PlaneGeometry(width, height, width, height)
-        const plane = this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: !edit }))
-        plane.position.set(width / 2, height / 2, 0)
-        scene.add(plane)
 
         // 渲染器
         const renderer = this.renderer
         renderer.setPixelRatio(window.devicePixelRatio)
         renderer.setSize(window.innerWidth, window.innerHeight)
-        
+
         // 轨道控制器，控制场景的缩放、旋转和移动
         const orbitControl = this.orbitControl
         orbitControl.enablePan = true
@@ -165,39 +158,66 @@ export default class Scene {
                 .concat(templates.map(x => x.model2d)).concat(templates.map(x => x.model3d))
         )
 
-        // 加载模板
-        this.templates = {}
-        templates.forEach((x, i) => {
-            this.templates[x.tid] = JSON.parse(JSON.stringify(x))
-        })
-
-        // 加载物体
+        // 加载模板和物体
         let oldObjects = [...this.objects]
         oldObjects.forEach(this.removeObject)
+
+        this.templates = {}
+        templates.forEach(this.addTemplate)
         objects.forEach(this.addObject)
+
+        this.toggleEdit(edit)
+    }
+
+    /**
+     * 仅切换显示模式，重新构建一下 objects 就行
+     * @param {string} mode 
+     */
+    switchMode = async (mode) => {
+        this.mode = mode
+        await Promise.all(
+            this.objects.map(x => x.meta.build(this))
+        )
+        this.render()
+    }
+
+    /**
+     * 仅切换编辑模式
+     * @param {boolean} edit 
+     */
+    toggleEdit = async (edit) => {
+        this.edit = edit
+        this.panel.edit = edit
+
+        const [width, height, _] = this.size
+        const scene = this.scene
+
+        // 编辑模式显示网格
+        scene.remove(this.grid)
+        const grid = this.grid = new Grid(width, height, {})
+        if (edit) scene.add(grid)
+
+        // 展示模式显示平面
+        scene.remove(this.plane)
+        const geometry = new THREE.PlaneGeometry(width, height, width, height)
+        const plane = this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: !edit }))
+        plane.position.set(width / 2, height / 2, 0)
+        scene.add(plane)
 
         // 物体移动控制器
         this.scene.remove(this.objectControl)
         const objectControl = this.objectControl
-        objectControl.size = 0.4
-        objectControl.showZ = false
-        objectControl.translationSnap = 0.25
-        objectControl.rotationSnap = 0.25 / Math.PI
-        objectControl.setScaleSnap(0.5)
-        objectControl.space = 'local'
-        // objectControl.position.y += 3 
         if (edit) scene.add(objectControl)
 
-        // 加载模板
-        if (edit) {
-            templates.forEach(async (x, i) => {
-                this.addTemplate(x, i)
-            })
-        }
+        // 是否显示模板
+        await this.switchMode(this.mode)
+        this.objects.forEach(x => {
+            if (x.meta.isTemplate) x.visible = edit
+        })
 
         scene.remove(this.templateTitle)
         this.templateTitle = MetaObject.buildText("模板列表", await this.loader.loadFont(), 1)
-        this.templateTitle.position.set(-13, height-5, 0)
+        this.templateTitle.position.set(-13, height - 3, 0)
         if (edit) scene.add(this.templateTitle)
 
         this.render()
@@ -216,22 +236,21 @@ export default class Scene {
         return object
     }
 
-    addTemplate = async (meta, i) => {
-        if (i == null) {
-            i = Object.keys(this.templates).length
-            let x = 0
-            const tid = meta.tid
-            while (meta.tid in this.templates) {
-                meta.tid = tid + String(x)
-                x += 1
-            }
-            this.templates[meta.tid] = JSON.parse(JSON.stringify(meta))
+    addTemplate = async (meta) => {
+        let i = Object.keys(this.templates).length
+        let x = 0
+        const tid = meta.tid
+        while (meta.tid in this.templates) {
+            meta.tid = tid + String(x)
+            x += 1
         }
+        this.templates[meta.tid] = JSON.parse(JSON.stringify(meta))
         let object = await this.addObject(Object.assign({}, meta, {
-            position: [i % 2 == 0 ? -12 : -6, this.size[1] - Math.floor(i / 2) * 4 - 8, 0],
-            showLabel: true, isTemplate: true
+            position: [i % 2 == 0 ? -12 : -6, this.size[1] - Math.floor(i / 2) * 5 - 6, 0],
+            isTemplate: true
         }))
         this.render()
+        return object
     }
 
     attachObject = (object) => {
@@ -312,8 +331,12 @@ export default class Scene {
         }
     }
 
+    /**
+     * 将物体面板移动到物体旁边
+     */
     movePanel = () => {
-        let pointer =  this.curObject.position.clone().project(this.camera)
+        if (!this.curObject) return
+        let pointer = this.curObject.position.clone().project(this.camera)
         let [x, y] = [(pointer.x + 1) / 2 * window.innerWidth, (1 - pointer.y) / 2 * window.innerHeight]
         this.panel.$el.style.left = (x + 30) + 'px'
         this.panel.$el.style.top = (y - 15) + 'px'
