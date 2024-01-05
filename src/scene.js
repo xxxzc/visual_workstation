@@ -8,14 +8,6 @@ import MetaObject from './metaobject.js'
 import Grid from './three_helpers/grid.js'
 import Loader from './three_helpers/loader.js'
 
-function toRad(x) {
-    return Math.PI * x / 180
-}
-
-function toDeg(x) {
-    return Math.round(x * 180 / Math.PI)
-}
-
 export default class Scene {
 
     /**
@@ -25,7 +17,7 @@ export default class Scene {
      * @param {Object[]} data.templates 
      * @param {string} mode 
      */
-    async build({ size, objects, templates }, mode = "2d") {    
+    async build({ size, objects, templates }, mode = "2d") {
         this.dispose()
 
         this.data = arguments[0]
@@ -112,11 +104,13 @@ export default class Scene {
         this.curObject = null
 
         // 加载模板
-        templates.forEach((x, i) => {
-            this.addObject(Object.assign({}, x, {
-                position: [i % 2 == 0 ? -12 : -6, height - Math.floor(i/2) * 4 - 2, 0], 
+        templates.forEach(async (x, i) => {
+            let object = await this.addObject(Object.assign({}, x, {
+                position: [i % 2 == 0 ? -12 : -6, height - Math.floor(i / 2) * 4 - 2, 0],
                 showLabel: true, isTemplate: true
             }))
+            // move text
+            object.children[1].position.y -= 1.5
         })
 
         this.render()
@@ -130,15 +124,24 @@ export default class Scene {
             data() {
                 return {
                     object: null,
-                    mode: 'translate',
-                    isTemplate: false,
-                    size: [1, 1, 1],
-                    rotate: [0, 0, 0]
-                }
-            },
-            watch: {
-                mode(value) {
-                    that.objectControl.mode = value
+                    /**
+                     * object.meta --> meta
+                     * 修改 meta 后先去修改 object3d 的表现
+                     * 点击保存时，再将 meta 变动保存到 object.meta
+                     * 点击重置时，应用 object.meta 去修改 object3d
+                     */
+                    meta: {
+                        id: '',
+                        tname: '', // 模板中文名称（类型） 
+                        name: '',
+                        size: [1, 1, 1],
+                        rotate: [0, 0, 0],
+                        rotate2d: [0, 0, 0],
+                        rotate3d: [0, 0, 0],
+                        model2d: '',
+                        model3d: '',
+                        isTemplate: false
+                    },
                 }
             },
             methods: {
@@ -146,12 +149,10 @@ export default class Scene {
                     if (this.object === object) return
                     this.object = object
                     if (!object) return
-                    this.size = [...this.object.meta.size]
-                    this.rotate = this.object.rotation.toArray().slice(0, 3).map(toDeg)
-                    this.isTemplate = this.object && this.object.meta.isTemplate
+                    this.meta = this.object.meta.toJson()
                 },
-                setMode(mode) {
-                    this.mode = mode
+                applyChange() {
+
                 },
                 onSave() {
                     if (!this.object) return
@@ -159,7 +160,7 @@ export default class Scene {
                 },
                 async onCopy() {
                     if (!this.object) return
-                    let meta = this.object.meta.toJson()
+                    let meta = this.meta.isTemplate ? that.templates[this.object.meta.tid] : this.object.meta.toJson()
                     meta.position = this.object.position.toArray()
                     meta.position[0] += 4
                     meta.id = ''
@@ -174,18 +175,6 @@ export default class Scene {
                     if (!this.object) return
                     that.removeObject(this.object)
                     this.object = null
-                },
-                onRotate() {
-                    that.render()
-                },
-                toRad(x) {
-                    return Math.PI * x / 180
-                },
-                toDeg(x) {
-                    return Math.round(x * 180 / Math.PI)
-                },
-                onSizeChange() {
-                    
                 }
             }
         })
@@ -212,6 +201,11 @@ export default class Scene {
         this.render()
     }
 
+    /**
+     * 取消对物体的控制
+     * @param {THREE.Object3D} object 
+     * @returns 
+     */
     detachObject = (object) => {
         if (!object) return
         if (this.objectControl.object === object) {
@@ -260,7 +254,7 @@ export default class Scene {
         this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
         this.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
         this.raycaster.setFromCamera(this.pointer, this.camera);
-        
+
         const intersects = this.raycaster.intersectObjects(this.objects, true);
         if (intersects.length > 0) {
             let objects = intersects.map(x => {

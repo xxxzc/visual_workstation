@@ -24,19 +24,19 @@ export default class MetaObject {
 
         this.category = t.category // 模板类别
         this.tid = t.tid // 模板id
-        this.name = t.name // 模板名称
+        this.tname = t.tname // 模板名称
 
-        this.label = t.label || this.name // 物体标签
+        this.name = t.name || this.tname // 物体标签
         this.showLabel = t.showLabel || false // 是否显示标签
 
         this.model2d = t.model2d // 平面模型
-        this.rotate2d = t.rotate2d || null // 平面模型旋转角度
+        this.rotate2d = t.rotate2d || [0, 0, 0] // 平面模型旋转角度
         this.color = t.color // 平面物体颜色
 
         this.model3d = t.model3d // 立体模型
-        this.rotate3d = t.rotate3d || null // 立体模型旋转角度
+        this.rotate3d = t.rotate3d || [0, 0, 0] // 立体模型旋转角度
 
-        this.rotate = t.rotate || null // 物体旋转角度
+        this.rotate = t.rotate || [0, 0, 0] // 物体旋转角度
         this.size = t.size || [1, 1, 1]
 
         this.id = t.id || generateUUID() // 物体 id
@@ -51,7 +51,7 @@ export default class MetaObject {
     toJson = () => {
         return {
             category: this.category,
-            tid: this.tid, name: this.name, label: this.label, showLabel: this.showLabel,
+            tid: this.tid, tname: this.tname, name: this.name, showLabel: this.showLabel,
             model2d: this.model2d, rotate2d: this.rotate2d, color: this.color,
             model3d: this.model3d, rotate3d: this.rotate3d,
             rotate: this.rotate, size: this.size,
@@ -103,6 +103,7 @@ export default class MetaObject {
 
         let text = this.#buildText(await loader.loadFont())
         text.visible = box.visible && this.showLabel
+        text.rotation.set(...this.rotate.map(x => -toRad(x)))
         group.add(text)
 
         if (_model2d && (mode === '2d' || !_model3d)) {
@@ -133,7 +134,7 @@ export default class MetaObject {
 
     #buildText = (font) => {
         let text = new THREE.Mesh(
-            new TextGeometry(this.label, {
+            new TextGeometry(this.name, {
                 font, size: 0.6, height: 0.1
             }), new THREE.MeshBasicMaterial({ color: 0x666666 })
         )

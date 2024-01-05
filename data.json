@@ -15,8 +15,8 @@
     "templates": [
         {
             "category": "Seat",
-            "tid": "NormalSeat",
-            "name": "正常工位",
+            "tid": "Seat",
+            "tname": "工位",
             "model2d": "",
             "model3d": "model/Desk.glb",
             "size": [
@@ -33,7 +33,7 @@
         {
             "category": "Room",
             "tid": "Room",
-            "name": "房间",
+            "tname": "房间",
             "size": [
                 1,
                 1,
@@ -43,7 +43,7 @@
         {
             "category": "Wall",
             "tid": "GlassWall",
-            "name": "玻璃墙",
+            "tname": "玻璃墙",
             "size": [
                 1,
                 1,
@@ -53,7 +53,7 @@
         {
             "category": "Appliance",
             "tid": "MicroWave",
-            "name": "微波炉",
+            "tname": "微波炉",
             "size": [
                 0.4,
                 0.3,
@@ -66,7 +66,7 @@
             "id": "100",
             "category": "Seat",
             "tid": "NormalSeat",
-            "name": "正常工位",
+            "tname": "工位",
             "size": [
                 1,
                 0.5,
@@ -77,7 +77,7 @@
                 31,
                 0.5
             ],
-            "label": "A-111",
+            "name": "A-111",
             "model2d": "",
             "model3d": "model/Desk.glb"
         },
@@ -85,7 +85,7 @@
             "id": "101",
             "category": "Seat",
             "tid": "NormalSeat",
-            "name": "正常工位",
+            "tname": "工位",
             "size": [
                 1,
                 0.5,
@@ -96,7 +96,7 @@
                 21,
                 0.5
             ],
-            "label": "A-111",
+            "name": "A-111",
             "model2d": "",
             "model3d": "model/Desk.glb",
             "rotate": [
