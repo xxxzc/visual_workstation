@@ -87,6 +87,8 @@ export default class MetaObject {
     build = async ({ mode, loader, edit = false }) => {
         this.group.clear()
 
+        const is3d = mode === '3d'
+
         let group = this.group
 
         let _model2d = await loader.load(this.model2d)
@@ -95,7 +97,12 @@ export default class MetaObject {
         const maxLen = Math.max(this.size[0], this.size[1])
 
         // 碰撞体积
-        let box = this.#buildBox()
+        let box;
+        if (mode === '3d') box = this.#buildBox()
+        else {
+            box = MetaObject.buildRect(this.size[0], this.size[1], 0x999999)
+            box.position.z += 0.1
+        }
         if (edit) {
             // 编辑模式，必显示碰撞体积
             box.visible = true
@@ -109,8 +116,9 @@ export default class MetaObject {
         group.add(box)
 
         let text = MetaObject.buildText(this.name, await loader.loadFont(), 0.6)
-        text.visible = box.visible && (this.showLabel || this.isTemplate)
+        text.visible = box.visible || (this.showLabel || this.isTemplate)
         text.rotation.set(...this.rotate.map(x => -toRad(x)))
+        text.position.set(-this.size[0] / 2 + 0.1, this.size[1] / 2 - 0.8, is3d ? this.size[2] : 0)
         group.add(text)
 
         if (_model2d && (mode === '2d' || !_model3d)) {
@@ -146,6 +154,17 @@ export default class MetaObject {
             }
 
             group.add(rect)
+        } else {
+            function strLen(str) {
+                var count = 0;
+                for (let i = 0, len = str.length; i < len; i++)
+                    count += str.charCodeAt(i) < 256 ? 1 : 2;
+                return count;
+            }
+            let len = strLen(this.name)
+            if (len > this.size[0]) {
+                text.scale.multiplyScalar(this.size[0] / len)
+            }
         }
         return group
     }
@@ -167,23 +186,31 @@ export default class MetaObject {
                 font, size, height: 0.1
             }), new THREE.MeshBasicMaterial({ color })
         )
-        text.position.set(-0.5, -0.1, 0)
         return text
     }
 
     static buildRect(width, height, color) {
-        const material = new THREE.LineBasicMaterial({
-            color: color
-        });
-        const points = [];
-        points.push(new THREE.Vector3(-width / 2, -height / 2, 0));
-        points.push(new THREE.Vector3(-width / 2, height / 2, 0));
-        points.push(new THREE.Vector3(width / 2, height / 2, 0));
-        points.push(new THREE.Vector3(width / 2, -height / 2, 0));
-        points.push(new THREE.Vector3(-width / 2, -height / 2, 0));
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const line = new THREE.Line(geometry, material);
-        return line
+        const points = []
+        points.push(new THREE.Vector3(-width / 2, -height / 2, 0))
+        points.push(new THREE.Vector3(-width / 2, height / 2, 0))
+        points.push(new THREE.Vector3(width / 2, height / 2, 0))
+        points.push(new THREE.Vector3(width / 2, -height / 2, 0))
+        points.push(new THREE.Vector3(-width / 2, -height / 2, 0))
+        const line = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints(points),
+            new THREE.LineBasicMaterial({ color: color, linewidth: 2 })
+        )
+
+        const plane = new THREE.Mesh(
+            new THREE.PlaneGeometry(width, height),
+            new THREE.MeshBasicMaterial({ visible: false }))
+
+        let group = new THREE.Group()
+        group.add(
+            line,
+            plane
+        )
+        return group
     }
 
     #build2d = (model) => {

@@ -6,7 +6,7 @@ const scene = new Scene()
 const globalControl = new Vue({
     el: "#globalControl",
     data: {
-        mode: '3d',
+        mode: '2d',
         edit: true,
         data: {},
         changed: false

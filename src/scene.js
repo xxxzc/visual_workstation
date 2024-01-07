@@ -239,10 +239,10 @@ export default class Scene {
 
     addTemplate = async (meta) => {
         let i = Object.keys(this.templates).length
-        let x = 0
+        let x = 1
         const tid = meta.tid
         while (meta.tid in this.templates) {
-            meta.tid = tid + String(x)
+            meta.tid = tid + '-' + String(x)
             x += 1
         }
         this.templates[meta.tid] = JSON.parse(JSON.stringify(meta))
@@ -308,11 +308,11 @@ export default class Scene {
         this.raycaster.setFromCamera(this.pointer, this.camera)
 
         let distance = 0
+        let selectObject = null
         if (this.curObject) {
             let p2 = this.curObject.position.clone().project(this.camera)
             distance = this.pointer.distanceTo(p2)
-            // 当指针远离 object 时，自动取消控制
-            if (this.pointer.distanceTo(p2) > 0.20) {
+            if (distance > 0.25) {
                 this.detachObject(this.curObject)
             }
         }
@@ -331,6 +331,7 @@ export default class Scene {
                     selectObject = object
                 }
             })
+
             /**
              * 只有当物体没有被控制且指针已经远离当前物体时，
              * 才会更换控制的物体
@@ -350,11 +351,13 @@ export default class Scene {
     /**
      * 将物体面板移动到物体旁边
      */
-    movePanel = () => {
-        if (!this.curObject) return
-        let pointer = this.curObject.position.clone().project(this.camera)
+    movePanel = (pointer) => {
+        if (!pointer) {
+            if (!this.curObject) return
+            pointer = this.curObject.position.clone().project(this.camera)
+        }
         let [x, y] = [(pointer.x + 1) / 2 * window.innerWidth, (1 - pointer.y) / 2 * window.innerHeight]
-        this.panel.$el.style.left = (x + 30) + 'px'
+        this.panel.$el.style.left = (x + 20) + 'px'
         this.panel.$el.style.top = (y - 15) + 'px'
     }
 
