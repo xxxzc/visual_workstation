@@ -2,6 +2,7 @@ import * as THREE from 'three'
 
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { generateUUID } from 'three/src/math/MathUtils.js';
+import RoundPlane from './three_helpers/rounded';
 
 import Loader from './three_helpers/loader'
 
@@ -15,6 +16,21 @@ function toRad(x) {
 
 function toDeg(x) {
     return Math.round(x * 180 / Math.PI)
+}
+
+function addLineShape( shape, color, x, y, z, rx, ry, rz, s ) {
+
+    // lines
+    shape.autoClose = true;
+
+    const points = shape.getPoints();
+    const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
+    // solid line
+    let line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: color } ) );
+    line.position.set( x, y, z - 25 );
+    line.rotation.set( rx, ry, rz );
+    line.scale.set( s, s, s );
+    return line
 }
 
 export default class MetaObject {
@@ -60,7 +76,7 @@ export default class MetaObject {
             model2d: this.model2d, rotate2d: this.rotate2d,
             model3d: this.model3d, rotate3d: this.rotate3d,
             color: this.color, size: this.size,
-            isTemplate: this.isTemplate
+            isTemplate: true
         }
     }
 
@@ -99,9 +115,9 @@ export default class MetaObject {
 
         // 碰撞体积
         let box;
-        if (mode === '3d') box = this.#buildBox()
+        if (mode === '3d') box = MetaObject.buildBox(this.size, this.color)
         else {
-            box = MetaObject.buildRect(this.size[0], this.size[1], this.color)
+            box = MetaObject.buildRect(this.size[0], this.size[1], this.color, !edit)
             box.position.z += 0.1
         }
         if (edit) {
@@ -110,13 +126,28 @@ export default class MetaObject {
         } else if (model2d || model3d) {
             box.visible = false
         }
+        box._visible = box.visible
 
         group.add(box)
-
-        let text = MetaObject.buildText(this.name, await loader.loadFont(), 0.6, this.textColor)
-        text.visible = box.visible || (this.showLabel || this.isTemplate)
+        let name = this.isTemplate ? this.tname : this.name
+        let text = MetaObject.buildText(name, 
+            await loader.loadFont(), 0.6, this.textColor)
+        text.visible = box.visible && (this.showLabel || this.isTemplate)
         text.rotation.set(...this.rotate.map(x => -toRad(x)))
-        text.position.set(-this.size[0] / 2 + 0.1, this.size[1] / 2 - 0.8, is3d ? this.size[2] : 0)
+        function strLen(str) {
+            var count = 0;
+            for (let i = 0, len = str.length; i < len; i++)
+                count += str.charCodeAt(i) < 256 ? 1 : 2;
+            return count;
+        }
+        let len = strLen(name)
+        let textScale = 1
+        if (len > Math.min(this.size[0], this.size[1]) && !this.isTemplate) {
+            textScale = Math.min(this.size[0], this.size[1]) / len * 1.5
+            text.scale.multiplyScalar(textScale)
+        }
+        text.position.set(-this.size[0] / 2 + 0.2 * textScale, this.size[1] / 2 - 0.9 * textScale, 
+            is3d ? this.size[2] : 0.2)
         group.add(text)
 
         if (mode === '2d') {
@@ -140,7 +171,7 @@ export default class MetaObject {
             // 将文本置于模型底部
             text.position.set(-1.8, -2.3, 0)
             // 限制模型大小到 2 以下
-            rect = MetaObject.buildRect(4.5, 4.5, 0x444460)
+            rect = MetaObject.buildRect(4.5, 4.5, 0x999999)
             rect.position.y -= 0.5
             if (maxLen > 2) {
                 group.scale.multiplyScalar(2 / maxLen)
@@ -151,17 +182,6 @@ export default class MetaObject {
             }
 
             group.add(rect)
-        } else {
-            function strLen(str) {
-                var count = 0;
-                for (let i = 0, len = str.length; i < len; i++)
-                    count += str.charCodeAt(i) < 256 ? 1 : 2;
-                return count;
-            }
-            let len = strLen(this.name)
-            if (len > this.size[0]) {
-                text.scale.multiplyScalar(this.size[0] / len)
-            }
         }
         if (!is3d) {
             group.scale.z = 0.1
@@ -169,12 +189,28 @@ export default class MetaObject {
         return group
     }
 
-    #buildBox = () => {
-        // return MetaObject.buildRect(this.size[0], this.size[1], this.color || 0x33aaff)
-        const geometry = new THREE.BoxGeometry(...this.size)
-        const material = new THREE.MeshBasicMaterial({ color: this.color || 0x888888, opacity: 0.5, transparent: true })
+    /**
+     * highlight this
+     * @param {string} color 
+     */
+    highlight = (color) => {
+        this.group.children[0].visible = true
+        let mesh = this.group.children[0]
+        if (!('material' in mesh)) mesh = mesh.children[0]
+        mesh.material.color.set(color)
+    }
+
+    delight = () => {
+        this.highlight(this.color)
+        this.group.children[0].visible = this.group.children[0]._visible
+    }
+
+
+    static buildBox = (size, color) => {
+        const geometry = new THREE.BoxGeometry(...size)
+        const material = new THREE.MeshBasicMaterial({ color: color || 0x888888, opacity: 0.5, transparent: true })
         let mesh = new THREE.Mesh(geometry, material)
-        mesh.position.z = this.size[2] / 2
+        mesh.position.z = size[2] / 2
         return mesh
     }
 
@@ -189,21 +225,21 @@ export default class MetaObject {
         return text
     }
 
-    static buildRect(width, height, color) {
+    static buildRect(width, height, color, showPlane=false) {
         const points = []
         points.push(new THREE.Vector3(-width / 2, -height / 2, 0))
         points.push(new THREE.Vector3(-width / 2, height / 2, 0))
         points.push(new THREE.Vector3(width / 2, height / 2, 0))
         points.push(new THREE.Vector3(width / 2, -height / 2, 0))
         points.push(new THREE.Vector3(-width / 2, -height / 2, 0))
-        const line = new THREE.Line(
+        let line = new THREE.Line(
             new THREE.BufferGeometry().setFromPoints(points),
             new THREE.LineBasicMaterial({ color: color, linewidth: 2 })
         )
 
         const plane = new THREE.Mesh(
             new THREE.PlaneGeometry(width, height),
-            new THREE.MeshBasicMaterial({ visible: false }))
+            new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.5, visible: showPlane }))
 
         let group = new THREE.Group()
         group.add(

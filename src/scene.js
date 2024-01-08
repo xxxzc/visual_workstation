@@ -7,6 +7,8 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import MetaObject from './metaobject.js'
 import Grid from './three_helpers/grid.js'
 import Loader from './three_helpers/loader.js'
+import RoundPlane from './three_helpers/rounded.js';
+import { generateUUID } from 'three/src/math/MathUtils.js';
 
 export default class Scene {
 
@@ -33,6 +35,13 @@ export default class Scene {
 
         this.orbitControl = new OrbitControls(this.camera, this.renderer.domElement)
         this.orbitControl.addEventListener('change', this.render)
+        this.isOrbiting = false
+        this.orbitControl.addEventListener('start', () => {
+            this.isOrbiting = true
+        })
+        this.orbitControl.addEventListener('end', () => {
+            this.isOrbiting = false
+        })
 
         this.raycaster = new THREE.Raycaster()
         this.pointer = new THREE.Vector2()
@@ -71,33 +80,37 @@ export default class Scene {
                     object: null,
                     /** @type {MetaObject}  */
                     meta: null,
-                    edit: true
+                    edit: true,
+                    model3ds: []
                 }
             },
             methods: {
                 setObject(object) {
                     if (this.object === object) return
                     this.object = object
-                    if (!object) return
+                    if (!object) {
+                        that.detachObject()
+                        return
+                    }
+                    that.attachObject(object)
                     this.meta = object.meta
+                    this.movePanel()
                 },
                 async applyChange() {
                     that.didChange()
-                    await this.meta.build({
-                        mode: that.mode, loader: that.loader, edit: that.edit
-                    })
+                    await this.meta.build(that)
                     that.render()
                 },
                 async newObject() {
                     if (!this.object) return
                     that.didChange()
-                    let meta = this.meta.toJson()
+                    let meta = this.meta.isTemplate ? this.meta.toTemplate() : this.meta.toJson()
                     meta.position = this.object.position.toArray()
-                    meta.position[0] += this.meta.isTemplate ? 4 : this.meta.size[0]
+                    meta.position[0] += this.meta.isTemplate ? -meta.position[0] : this.meta.size[0]
                     meta.id = ''
                     meta.isTemplate = false
                     that.detachObject(this.object)
-                    that.attachObject(await that.addObject(meta))
+                    this.setObject(await that.addObject(meta))
                 },
                 async newTemplate() {
                     if (!this.object) return
@@ -106,14 +119,51 @@ export default class Scene {
                     meta.id = ''
                     meta.isTemplate = true
                     that.detachObject(this.object)
-                    that.attachObject(await that.addTemplate(meta, null))
+                    this.setObject(await that.addTemplate(meta))
                 },
                 onDelete() {
                     if (!this.object) return
                     that.didChange()
                     that.removeObject(this.object)
                     this.object = null
+                },
+                movePanel(pointer) {
+                    if (!pointer) {
+                        if (!this.object) return
+                        pointer = this.object.position.clone().project(that.camera)
+                    }
+                    let [x, y] = [(pointer.x + 1) / 2 * window.innerWidth, (1 - pointer.y) / 2 * window.innerHeight]
+                    this.$el.style.left = (x + 20) + 'px'
+                    this.$el.style.top = (y - 15) + 'px'
+                },
+                async applyToAll() {
+                    await this.applyChange()
+                    await Promise.all(that.objects.map(
+                        x => {
+                            if (!x.meta.isTemplate && x.meta.tid === this.meta.tid) {
+                                x.meta.rotate2d = this.meta.rotate2d
+                                x.meta.model2d = this.meta.model2d
+                                x.meta.rotate3d = this.meta.rotate3d
+                                x.meta.model3d = this.meta.model3d
+                                x.meta.tname = this.meta.tname
+                                return x.meta.build(that)
+                            }
+                            return null
+                        }
+                    ))
+                    that.render()
+                },
+                async get3dModels() {
+                    let resp = await fetch("http://localhost:8000/models")
+                    let data = await resp.json()
+                    this.model3ds = data
                 }
+            }
+        })
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                if (this.panel.object) this.panel.setObject(null)
             }
         })
     }
@@ -129,7 +179,15 @@ export default class Scene {
      * @param {string} ctx.mode 
      * @param {boolean} ctx.edit
      */
-    async build({ size, objects, templates }, { didChange, mode = "2d", edit = false }) {
+    async build({ size, objects, templates, model3ds }, { didChange, mode = "2d", edit = false }) {
+        if (objects.length === 0 && templates.length === 0) {
+            templates.push({
+                "category": "Room", "tid": "Room", "tname": "房间",
+                "showLabel": true, "color": "#aaaaaa", "size": [4, 4, 4],
+                "isTemplate": true
+            })
+        }
+
         this.size = size
         const width = size[0]
         const height = size[1]
@@ -138,6 +196,7 @@ export default class Scene {
         this.edit = edit // 编辑模式
         this.panel.edit = edit
         this.didChange = didChange // 场景变化回调函数
+        this.panel.model3ds = model3ds
 
         this.camera.position.set(width / 3, height / 2, width * 1.3)
 
@@ -163,8 +222,8 @@ export default class Scene {
         oldObjects.forEach(this.removeObject)
 
         this.templates = {}
-        templates.forEach(this.addTemplate)
-        objects.forEach(this.addObject)
+        await Promise.all(templates.map(x => this.addTemplate(x)))
+        await Promise.all(objects.map(x => this.addObject(x)))
 
         this.toggleEdit(edit)
     }
@@ -199,10 +258,17 @@ export default class Scene {
 
         // 展示模式显示平面
         scene.remove(this.plane)
-        const geometry = new THREE.PlaneGeometry(width, height, width, height)
-        const plane = this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: !edit }))
-        plane.position.set(width / 2, height / 2, 0)
-        scene.add(plane)
+        if (!edit) {
+            this.plane = new THREE.Group()
+            let plane1 = RoundPlane(this.size[0], this.size[1], 1, 0xcccccc, false)
+            let plane2 = RoundPlane(this.size[0], this.size[1], 1, 0x999999, true)
+            this.plane.add(plane1, plane2)
+        } else {
+            const geometry = new THREE.PlaneGeometry(width, height, width, height)
+            const plane = this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: false }))
+            plane.position.set(width / 2, height / 2, 0)
+        }
+        scene.add(this.plane)
 
         // 物体移动控制器
         this.scene.remove(this.objectControl)
@@ -232,6 +298,10 @@ export default class Scene {
          */
         let object = await metaObject.build(this)
         this.objects.push(object)
+        // 当 object 的模板不存在时，将其作为模板加入
+        if (!(object.meta.tid in this.templates)) {
+            this.addTemplate(object.meta.toTemplate())
+        }
         this.scene.add(object)
         this.render()
         return object
@@ -239,11 +309,8 @@ export default class Scene {
 
     addTemplate = async (meta) => {
         let i = Object.keys(this.templates).length
-        let x = 1
-        const tid = meta.tid
-        while (meta.tid in this.templates) {
-            meta.tid = tid + '-' + String(x)
-            x += 1
+        if (meta.tid in this.templates) {
+            meta.tid = generateUUID().replace('-', '')
         }
         this.templates[meta.tid] = JSON.parse(JSON.stringify(meta))
         let object = await this.addObject(Object.assign({}, meta, {
@@ -257,9 +324,11 @@ export default class Scene {
     attachObject = (object) => {
         if (!object) return
         if (this.curObject === object) return
+        this.detachObject()
         this.curObject = object
-        this.panel.setObject(object)
-        this.movePanel()
+        object.meta.highlight('#FCE911')
+        // this.panel.setObject(object)
+        this.panel.movePanel()
         if (!object.meta.isTemplate) this.objectControl.attach(object)
         this.render()
     }
@@ -270,13 +339,15 @@ export default class Scene {
      * @returns 
      */
     detachObject = (object) => {
+        object = object || this.curObject
         if (!object) return
         if (this.objectControl.object === object) {
-            this.objectControl.detach();
+            this.objectControl.detach()
         }
+        object.meta.delight()
         this.curObject = null
-        this.panel.setObject(null)
-        this.render();
+        // this.panel.setObject(null)
+        this.render()
     }
 
     removeObject = (object) => {
@@ -288,77 +359,84 @@ export default class Scene {
         this.render()
     }
 
+    lookAtObject = (object) => {
+        if (!object) return
+        this.camera.position.set(...object.position.toArray())
+        this.camera.position.z = 20
+        this.orbitControl.target.set(...object.position.toArray())
+        this.panel.setObject(object)
+        this.render()
+    }
+
+    getIntersect = () => {
+        this.raycaster.setFromCamera(this.pointer, this.camera)
+        const intersects = this.raycaster.intersectObjects(this.objects, true)
+        if (!intersects.length) return null
+        let size = this.size[0] * this.size[1]
+        let minObject = null
+        intersects.forEach(x => {
+            let object = x.object
+            let cnt = 10
+            while (!object.meta && cnt--) object = object.parent
+            if (cnt > 0 && object.meta.size[0] * object.meta.size[1] < size) {
+                size = object.meta.size[0] * object.meta.size[1]
+                minObject = object
+            }
+        })
+        return minObject
+    }
+
+    getDistance = (object) => {
+        object = object || this.curObject
+        if (!object) return 0
+        let p2 = object.position.clone().project(this.camera)
+        return this.pointer.distanceTo(p2)
+    }
+
     onPointerDown = (event) => {
+        if (event.target.__vue__) return
         if (event.target.tagName !== 'CANVAS') return
         this.onDownPosition.set(event.clientX, event.clientY)
     }
 
     onPointerUp = (event) => {
-        if (event.target.tagName !== 'CANVAS') return
-        this.onUpPosition.set(event.clientX, event.clientY)
-        if (this.onDownPosition.distanceTo(this.onUpPosition) === 0) {
-            this.detachObject(this.curObject)
-        }
-    }
-
-    onPointerMove = (event) => {
+        if (event.target.__vue__) return
         if (event.target.tagName !== 'CANVAS') return
         this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
         this.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1
-        this.raycaster.setFromCamera(this.pointer, this.camera)
 
-        let distance = 0
-        let selectObject = null
-        if (this.curObject) {
-            let p2 = this.curObject.position.clone().project(this.camera)
-            distance = this.pointer.distanceTo(p2)
-            if (distance > 0.25) {
-                this.detachObject(this.curObject)
-            }
-        }
-
-        const intersects = this.raycaster.intersectObjects(this.objects, true);
-        if (intersects.length > 0) {
-            // 重叠时，选择面积最小的
-            let selectObject = null
-            let size = this.size[0] * this.size[1]
-            intersects.forEach(x => {
-                let object = x.object
-                let cnt = 10
-                while (!object.meta && cnt--) object = object.parent
-                if (cnt > 0 && object.meta.size[0] * object.meta.size[1] < size) {
-                    size = object.meta.size[0] * object.meta.size[1]
-                    selectObject = object
-                }
-            })
-
-            /**
-             * 只有当物体没有被控制且指针已经远离当前物体时，
-             * 才会更换控制的物体
-             */
-            if (selectObject && selectObject !== this.curObject
-                && !this.objectControl.dragging
-                && (!this.curObject || distance > 0.05)) {
-                this.attachObject(selectObject)
-                this.movePanel()
-            }
-        }
-        if (this.objectControl.dragging && this.objectControl.mode === 'translate') {
-            this.movePanel()
-        }
+        this.onUpPosition.set(event.clientX, event.clientY)
+        // let clickObject = this.getIntersect()
+        // if (this.curObject
+        //     && this.getIntersect()
+        // ) {
+        //     this.panel.setObject(this.curObject)
+        // } else this.panel.setObject(null)
+        this.panel.setObject(this.getIntersect())
     }
 
-    /**
-     * 将物体面板移动到物体旁边
-     */
-    movePanel = (pointer) => {
-        if (!pointer) {
-            if (!this.curObject) return
-            pointer = this.curObject.position.clone().project(this.camera)
+    onPointerMove = (event) => {
+        this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
+        this.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1
+
+        if (event.target.__vue__) return
+        if (event.target.tagName !== 'CANVAS') return
+
+        if (this.objectControl.dragging) {
+            this.panel.movePanel(this.pointer)
         }
-        let [x, y] = [(pointer.x + 1) / 2 * window.innerWidth, (1 - pointer.y) / 2 * window.innerHeight]
-        this.panel.$el.style.left = (x + 20) + 'px'
-        this.panel.$el.style.top = (y - 15) + 'px'
+
+        if (this.isOrbiting) return
+ 
+        // 指针远离选择物体时，自动隐藏
+        const distance = this.getDistance()
+        if (distance > 0.25 && !this.panel.object) this.detachObject()
+
+        const hoverObject = this.getIntersect(event)
+        if (hoverObject && hoverObject !== this.curObject
+            && (!this.curObject || distance > 0.05)) {
+            if (!this.panel.object) this.attachObject(hoverObject)
+        }
     }
 
     onWindowResize = () => {
@@ -373,7 +451,7 @@ export default class Scene {
     }
 
     buildLight() {
-        let ambientLight = new THREE.AmbientLight(0x606060, 3)
+        let ambientLight = new THREE.AmbientLight(0xffffff, 3)
         this.scene.add(ambientLight)
         let directionalLight = new THREE.DirectionalLight(0xffffff, 3)
         directionalLight.position.set(1, 0.75, 0.5).normalize()

@@ -6,14 +6,57 @@ const scene = new Scene()
 const globalControl = new Vue({
     el: "#globalControl",
     data: {
-        mode: '2d',
-        edit: true,
-        data: {},
-        changed: false
+        mode: '2d', edit: true, changed: false,
+        data: {
+            size: [0, 0, 0],
+            path: []
+        },
+        objects: scene.objects,
+        searchValue: ""
     },
     watch: {
         mode() {
             scene.switchMode(this.mode)
+        }
+    },
+    computed: {
+        sortedObjects() {
+            let objects = this.objects
+            if (this.searchValue) {
+                let input = this.searchValue.toLowerCase()
+                objects = objects.filter(
+                    object => {
+                        let searchFields = ['tname', 'name', 'category']
+                        for (let field of searchFields) {
+                            if (object.meta[field].toLowerCase().indexOf(input) > -1) return true
+                        }
+                        return false
+                    }
+                )
+            }
+            return objects.sort(
+                (x, y) => {
+                    let c = x.meta.name < y.meta.name ? -1 : 1
+                    c = x.meta.name === y.meta.name ? 0 : c
+                    return c
+                }
+            )
+        },
+        objectCounts() {
+            let counts = {}
+            for (let object of this.objects) {
+                if (object.meta.isTemplate) continue
+                let category = object.meta.tname
+                if (counts[category]) counts[category]++
+                else counts[category] = 1
+            }
+            let result = []
+            for (let [k, v] of Object.entries(counts)) {
+                result.push(
+                    { title: k + ' ' + v, key: k, children: [] }
+                )
+            }
+            return result
         }
     },
     created() {
@@ -32,6 +75,10 @@ const globalControl = new Vue({
                 edit: this.edit,
                 didChange: this.didChange
             })
+        },
+        applyChange() {
+            this.buildScene()
+            this.didChange()
         },
         async load() {
             let result = await Promise.all([
@@ -61,6 +108,20 @@ const globalControl = new Vue({
             })
             this.changed = false
             this.$message.success('提交成功');
+        },
+        handleSearch(value) {
+            this.searchValue = value
+        },
+        select(value) {
+            for (let object of scene.objects) {
+                if (object.meta.id === value) {
+                    scene.lookAtObject(object)
+                    return
+                }
+            }
+        },
+        unselect() {
+            scene.panel.setObject(null)
         },
         changeEdit(e) {
             if (e) e.target.blur()
