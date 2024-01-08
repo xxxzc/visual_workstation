@@ -18,18 +18,18 @@ function toDeg(x) {
     return Math.round(x * 180 / Math.PI)
 }
 
-function addLineShape( shape, color, x, y, z, rx, ry, rz, s ) {
+function addLineShape(shape, color, x, y, z, rx, ry, rz, s) {
 
     // lines
     shape.autoClose = true;
 
     const points = shape.getPoints();
-    const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
+    const geometryPoints = new THREE.BufferGeometry().setFromPoints(points);
     // solid line
-    let line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: color } ) );
-    line.position.set( x, y, z - 25 );
-    line.rotation.set( rx, ry, rz );
-    line.scale.set( s, s, s );
+    let line = new THREE.Line(geometryPoints, new THREE.LineBasicMaterial({ color: color }));
+    line.position.set(x, y, z - 25);
+    line.rotation.set(rx, ry, rz);
+    line.scale.set(s, s, s);
     return line
 }
 
@@ -130,7 +130,7 @@ export default class MetaObject {
 
         group.add(box)
         let name = this.isTemplate ? this.tname : this.name
-        let text = MetaObject.buildText(name, 
+        let text = MetaObject.buildText(name,
             await loader.loadFont(), 0.6, this.textColor)
         text.visible = box.visible && (this.showLabel || this.isTemplate)
         text.rotation.set(...this.rotate.map(x => -toRad(x)))
@@ -146,7 +146,7 @@ export default class MetaObject {
             textScale = Math.min(this.size[0], this.size[1]) / len * 1.5
             text.scale.multiplyScalar(textScale)
         }
-        text.position.set(-this.size[0] / 2 + 0.2 * textScale, this.size[1] / 2 - 0.9 * textScale, 
+        text.position.set(-this.size[0] / 2 + 0.2 * textScale, this.size[1] / 2 - 0.9 * textScale,
             is3d ? this.size[2] : 0.2)
         group.add(text)
 
@@ -225,7 +225,7 @@ export default class MetaObject {
         return text
     }
 
-    static buildRect(width, height, color, showPlane=false) {
+    static buildRect(width, height, color, showPlane = false) {
         const points = []
         points.push(new THREE.Vector3(-width / 2, -height / 2, 0))
         points.push(new THREE.Vector3(-width / 2, height / 2, 0))
