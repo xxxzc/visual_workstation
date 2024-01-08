@@ -31,7 +31,8 @@ export default class MetaObject {
 
         this.model2d = t.model2d // 平面模型
         this.rotate2d = t.rotate2d || [0, 0, 0] // 平面模型旋转角度
-        this.color = t.color // 平面物体颜色
+        this.color = t.color || '#aaaaaa' // 平面物体颜色
+        this.textColor = t.textColor || '#333333' // 文本颜色
 
         this.model3d = t.model3d // 立体模型
         this.rotate3d = t.rotate3d || [0, 0, 0] // 立体模型旋转角度
@@ -91,8 +92,8 @@ export default class MetaObject {
 
         let group = this.group
 
-        let _model2d = await loader.load(this.model2d)
-        let _model3d = await loader.load(this.model3d)
+        let model2d = this.#build2d(await loader.load(this.model2d))
+        let model3d = this.#build3d(await loader.load(this.model3d))
 
         const maxLen = Math.max(this.size[0], this.size[1])
 
@@ -100,35 +101,31 @@ export default class MetaObject {
         let box;
         if (mode === '3d') box = this.#buildBox()
         else {
-            box = MetaObject.buildRect(this.size[0], this.size[1], 0x999999)
+            box = MetaObject.buildRect(this.size[0], this.size[1], this.color)
             box.position.z += 0.1
         }
         if (edit) {
             // 编辑模式，必显示碰撞体积
             box.visible = true
-        } else if (mode === '2d' && _model2d) {
-            // 有 2d 模型
-            box.visible = false
-        } else if (mode === '3d' && (_model3d || _model2d)) {
+        } else if (model2d || model3d) {
             box.visible = false
         }
 
         group.add(box)
 
-        let text = MetaObject.buildText(this.name, await loader.loadFont(), 0.6)
+        let text = MetaObject.buildText(this.name, await loader.loadFont(), 0.6, this.textColor)
         text.visible = box.visible || (this.showLabel || this.isTemplate)
         text.rotation.set(...this.rotate.map(x => -toRad(x)))
         text.position.set(-this.size[0] / 2 + 0.1, this.size[1] / 2 - 0.8, is3d ? this.size[2] : 0)
         group.add(text)
 
-        if (_model2d && (mode === '2d' || !_model3d)) {
-            let model2d = this.#build2d(_model2d)
-            group.add(model2d)
-        }
-
-        if (_model3d && mode === '3d') {
-            let model3d = this.#build3d(_model3d)
-            group.add(model3d)
+        if (mode === '2d') {
+            if (model2d) group.add(model2d)
+            else if (model3d) {
+                group.add(model3d)
+            }
+        } else if (mode === '3d') {
+            if (model3d || model2d) group.add(model3d || model2d)
         }
 
         group.scale.set(1, 1, 1)
@@ -165,6 +162,9 @@ export default class MetaObject {
             if (len > this.size[0]) {
                 text.scale.multiplyScalar(this.size[0] / len)
             }
+        }
+        if (!is3d) {
+            group.scale.z = 0.1
         }
         return group
     }
@@ -213,9 +213,12 @@ export default class MetaObject {
         return group
     }
 
-    #build2d = (model) => {
-        if (!model) return null
-        return null
+    #build2d = (map) => {
+        if (!map) return null
+        const material = new THREE.SpriteMaterial({ map: map, color: 0xffffff });
+        const sprite = new THREE.Sprite(material);
+        sprite.scale.set(...this.size)
+        return sprite
     }
 
     #build3d = (model) => {

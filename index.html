@@ -33,7 +33,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             box-shadow: 0px 1px 8px #aaaaaaaa;
-            min-width: 380px;
+            width: 380px;
         }
 
         .space {
@@ -43,11 +43,15 @@
         }
 
         .form-label {
+            text-align: right;
             width: 60px;
         }
 
         .form-input {
             flex: 1;
+            display: flex;
+            margin-left: 8px;
+            gap: 8px;
         }
 
         [v-cloak0] {
@@ -87,14 +91,26 @@
                 </div>
                 <a-button icon="delete" @click="onDelete"></a-button>
             </div>
-            <div><b>{{meta.isTemplate ? '模板信息' : '物体信息'}}</b></div>
+            <div><b>{{meta.isTemplate ? '模板' : ''}} {{meta.name}} 的信息</b></div>
             <div class="space" hidden>
                 <span>主键</span> <a-input placeholder="id" v-model="meta.id" size="small" />
             </div>
-            <div class="space" v-if="meta.isTemplate">
+            <div class="space">
+                <div class="form-label">所属分类</div>
+                <div class="form-input">
+                    <a-input :disabled="!meta.isTemplate" style="width: 100px;" v-model="meta.category" size="small"
+                        @change="applyChange" />
+                </div>
                 <div class="form-label">模板ID</div>
                 <div class="form-input">
                     <a-input :disabled="!edit" style="width: 100px;" v-model="meta.tid" size="small"
+                        @change="applyChange" />
+                </div>
+            </div>
+            <div class="space">
+                <div class="form-label" v-show="!meta.isTemplate">物体名称</div>
+                <div class="form-input" v-show="!meta.isTemplate">
+                    <a-input :disabled="!edit" style="width: 100px;" v-model="meta.name" size="small"
                         @change="applyChange" />
                 </div>
                 <div class="form-label">模板名称</div>
@@ -103,35 +119,29 @@
                         @change="applyChange" />
                 </div>
             </div>
-            <div class="space">
-                <div class="form-label">分类</div>
-                <div class="form-input">
-                    <a-input :disabled="!edit" style="width: 100px;" v-model="meta.category" size="small"
-                        @change="applyChange" />
-                </div>
-                <div class="form-label">名称</div>
-                <div class="form-input">
-                    <a-input :disabled="!edit" style="width: 100px;" v-model="meta.name" size="small"
-                        @change="applyChange" />
-                </div>
-            </div>
             <div v-if="edit">
                 <div><b>{{meta.isTemplate ? '模板调整' : '物体调整'}}</b></div>
                 <div class="space">
                     <div class="form-label">大小(m)</div>
                     <div class="form-input">
-                        横 <a-input-number style="width: 50px;" v-model="meta.size[0]" @change="applyChange"
-                            size="small"></a-input-number>
-                        纵 <a-input-number style="width: 50px;" v-model="meta.size[1]" @change="applyChange"
-                            size="small"></a-input-number>
-                        高 <a-input-number style="width: 50px;" v-model="meta.size[2]" @change="applyChange"
-                            size="small"></a-input-number>
+                        <div>横 <a-input-number style="width: 50px;" v-model="meta.size[0]" @change="applyChange"
+                                size="small"></a-input-number></div>
+                        <div>纵 <a-input-number style="width: 50px;" v-model="meta.size[1]" @change="applyChange"
+                                size="small"></a-input-number></div>
+                        <div>高 <a-input-number style="width: 50px;" v-model="meta.size[2]" @change="applyChange"
+                                size="small"></a-input-number></div>
                     </div>
                 </div>
                 <div class="space">
                     <div class="form-label">盒子颜色</div>
                     <div class="form-input">
-                        <a-input :disabled="!edit" v-model="meta.color" size="small" @change="applyChange" />
+                        <a-input :disabled="!edit" style="width: 100px;" v-model="meta.color" size="small"
+                            @change="applyChange" />
+                    </div>
+                    <div class="form-label">字体颜色</div>
+                    <div class="form-input">
+                        <a-input :disabled="!edit" style="width: 100px;" v-model="meta.textColor" size="small"
+                            @change="applyChange" />
                     </div>
                 </div>
                 <div v-if="!meta.isTemplate" class="space">
@@ -140,23 +150,6 @@
                     <div class="form-input">
                         <a-slider class="form-input" v-model="meta.rotate[2]" :step="15" :max="360"
                             @change="applyChange" />
-                    </div>
-                </div>
-                <div v-if="meta.isTemplate" class="space">
-                    <div class="form-label">2D模型</div>
-                    <div class="form-input">
-                        <a-input :disabled="!edit" v-model="meta.model2d" size="small" @change="applyChange" />
-                    </div>
-                </div>
-                <div v-if="meta.isTemplate" class="space">
-                    <div class="form-label">旋转2D</div>
-                    <div class="form-input">
-                        <a-input-number style="width: 50px;" v-model="meta.rotate2d[0]" @change="applyChange"
-                            size="small"></a-input-number>
-                        <a-input-number style="width: 50px;" v-model="meta.rotate2d[1]" @change="applyChange"
-                            size="small"></a-input-number>
-                        <a-input-number style="width: 50px;" v-model="meta.rotate2d[2]" @change="applyChange"
-                            size="small"></a-input-number>
                     </div>
                 </div>
                 <div v-if="meta.isTemplate" class="space">
@@ -173,6 +166,23 @@
                         <a-input-number style="width: 50px;" v-model="meta.rotate3d[1]" @change="applyChange"
                             size="small"></a-input-number>
                         <a-input-number style="width: 50px;" v-model="meta.rotate3d[2]" @change="applyChange"
+                            size="small"></a-input-number>
+                    </div>
+                </div>
+                <div v-if="meta.isTemplate" class="space">
+                    <div class="form-label">2D模型</div>
+                    <div class="form-input">
+                        <a-input :disabled="!edit" v-model="meta.model2d" size="small" @change="applyChange" />
+                    </div>
+                </div>
+                <div v-if="meta.isTemplate" class="space">
+                    <div class="form-label">旋转2D</div>
+                    <div class="form-input">
+                        <a-input-number style="width: 50px;" v-model="meta.rotate2d[0]" @change="applyChange"
+                            size="small"></a-input-number>
+                        <a-input-number style="width: 50px;" v-model="meta.rotate2d[1]" @change="applyChange"
+                            size="small"></a-input-number>
+                        <a-input-number style="width: 50px;" v-model="meta.rotate2d[2]" @change="applyChange"
                             size="small"></a-input-number>
                     </div>
                 </div>

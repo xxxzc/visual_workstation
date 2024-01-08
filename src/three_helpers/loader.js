@@ -11,7 +11,7 @@ export default class Loader {
         this.fontLoader = new FontLoader()
         this.gltfLoader = new GLTFLoader()
         this.svgLoader = new SVGLoader()
-        this.imgLoader = new THREE.ImageLoader()
+        this.imgLoader = new THREE.TextureLoader()
         this.objects = {}
     }
 
