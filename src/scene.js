@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+THREE.Object3D.DefaultUp = new THREE.Vector3(0,0,1)
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
@@ -7,15 +8,16 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import MetaObject from './metaobject.js'
 import Grid from './three_helpers/grid.js'
 import Loader from './three_helpers/loader.js'
-import RoundPlane from './three_helpers/rounded.js';
 import { generateUUID } from 'three/src/math/MathUtils.js';
 
 export default class Scene {
 
     constructor() {
+        MetaObject.setContext(this)
+
         this.mode = '2d' // 展示模式
         this.edit = true // 是否启用编辑
-        this.size = [50, 50, 4] // 场景大小
+        this.size = [40, 40, 3] // 场景大小
 
         /** @type {THREE.Object3D[]} */
         this.objects = [] // 场景的所有物体
@@ -26,12 +28,14 @@ export default class Scene {
         this.loader = new Loader() // 模型加载器
 
         this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
+        this.camera.up.set(0,0,1)
         this.scene = new THREE.Scene()
         this.scene.background = new THREE.Color(0xf0f0f0)
 
         this.buildLight() // 灯光
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
+        // this.renderer.setAnimationLoop(this.render)
 
         this.orbitControl = new OrbitControls(this.camera, this.renderer.domElement)
         this.orbitControl.addEventListener('change', this.render)
@@ -98,7 +102,7 @@ export default class Scene {
                 },
                 async applyChange() {
                     that.didChange()
-                    await this.meta.build(that)
+                    await this.meta.build()
                     that.render()
                 },
                 async newObject() {
@@ -106,7 +110,11 @@ export default class Scene {
                     that.didChange()
                     let meta = this.meta.isTemplate ? this.meta.toTemplate() : this.meta.toJson()
                     meta.position = this.object.position.toArray()
-                    meta.position[0] += this.meta.isTemplate ? -meta.position[0] : this.meta.size[0]
+                    if (this.meta.isTemplate) meta.position[0] -= meta.position[0]
+                    else {
+                        let i = meta.rotate[2] > 0 && meta.rotate[2] % 90 === 0 ? 1 : 0
+                        meta.position[i] += this.meta.size[i]
+                    }
                     meta.id = ''
                     meta.isTemplate = false
                     that.detachObject(this.object)
@@ -146,7 +154,7 @@ export default class Scene {
                                 x.meta.rotate3d = this.meta.rotate3d
                                 x.meta.model3d = this.meta.model3d
                                 x.meta.tname = this.meta.tname
-                                return x.meta.build(that)
+                                return x.meta.build()
                             }
                             return null
                         }
@@ -198,7 +206,7 @@ export default class Scene {
         this.didChange = didChange // 场景变化回调函数
         this.panel.model3ds = model3ds
 
-        this.camera.position.set(width / 3, height / 2, width * 1.3)
+        this.camera.position.set(0, 0, width * 1.3)
 
         // 渲染器
         const renderer = this.renderer
@@ -208,7 +216,6 @@ export default class Scene {
         // 轨道控制器，控制场景的缩放、旋转和移动
         const orbitControl = this.orbitControl
         orbitControl.enablePan = true
-        orbitControl.target.set(width / 3, height / 2, 0)
         orbitControl.update()
 
         // 加载所有模型
@@ -235,7 +242,7 @@ export default class Scene {
     switchMode = async (mode) => {
         this.mode = mode
         await Promise.all(
-            this.objects.map(x => x.meta.build(this))
+            this.objects.map(x => x.meta.build())
         )
         this.render()
     }
@@ -258,16 +265,18 @@ export default class Scene {
 
         // 展示模式显示平面
         scene.remove(this.plane)
-        if (!edit) {
-            this.plane = new THREE.Group()
-            let plane1 = RoundPlane(this.size[0], this.size[1], 1, 0xcccccc, false)
-            let plane2 = RoundPlane(this.size[0], this.size[1], 1, 0x999999, true)
-            this.plane.add(plane1, plane2)
-        } else {
-            const geometry = new THREE.PlaneGeometry(width, height, width, height)
-            const plane = this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: false }))
-            plane.position.set(width / 2, height / 2, 0)
-        }
+        // if (!edit) {
+        //     this.plane = new THREE.Group()
+        //     let plane1 = RoundPlane(this.size[0], this.size[1], 1, 0xcccccc, false)
+        //     let plane2 = RoundPlane(this.size[0], this.size[1], 1, 0x999999, true)
+        //     this.plane.add(plane1, plane2)
+        // } else {
+        //     const geometry = new THREE.PlaneGeometry(width, height, width, height)
+        //     const plane = this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: false }))
+        // }
+        const geometry = new THREE.PlaneGeometry(width, height, width, height)
+        const plane = this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial())
+        this.plane.visible = !edit
         scene.add(this.plane)
 
         // 物体移动控制器
@@ -277,14 +286,11 @@ export default class Scene {
 
         // 是否显示模板
         await this.switchMode(this.mode)
-        this.objects.forEach(x => {
-            if (x.meta.isTemplate) x.visible = edit
-        })
 
         scene.remove(this.templateTitle)
         this.templateTitle = MetaObject.buildText("模板列表",
             await this.loader.loadFont(), 1, 0x333333)
-        this.templateTitle.position.set(-13, height - 3, 0)
+        this.templateTitle.position.set(-width/2-13, height/2 - 2, 0)
         if (edit) scene.add(this.templateTitle)
 
         this.render()
@@ -296,7 +302,7 @@ export default class Scene {
         /**
          * @type {THREE.Object3D} object
          */
-        let object = await metaObject.build(this)
+        let object = await metaObject.build()
         this.objects.push(object)
         // 当 object 的模板不存在时，将其作为模板加入
         if (!(object.meta.tid in this.templates)) {
@@ -310,14 +316,17 @@ export default class Scene {
     addTemplate = async (meta) => {
         let i = Object.keys(this.templates).length
         if (meta.tid in this.templates) {
-            meta.tid = generateUUID().replace('-', '')
+            meta.tid = generateUUID().replace(/\-/g, '')
         }
         this.templates[meta.tid] = JSON.parse(JSON.stringify(meta))
         let object = await this.addObject(Object.assign({}, meta, {
-            position: [i % 2 == 0 ? -11 : -6, this.size[1] - Math.floor(i / 2) * 5 - 6, 0],
+            position: [
+                i % 2 == 0 ? -this.size[0]/2-11 : -this.size[0]/2-6, 
+                this.size[1]/2 - Math.floor(i / 2) * 5 - 6, 
+                0
+            ],
             isTemplate: true
         }))
-        this.render()
         return object
     }
 

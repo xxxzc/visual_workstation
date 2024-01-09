@@ -1,5 +1,8 @@
 import * as THREE from 'three'
 
+/**
+ * 构建平面网格
+ */
 export default class Grid extends THREE.LineSegments {
     /**
      * 修改默认的 GridHelper 已支持长宽不一致的网格
@@ -16,17 +19,18 @@ export default class Grid extends THREE.LineSegments {
         colorMain = new THREE.Color(colorMain);
         colorSub = new THREE.Color(colorSub);
 
-        const vertices = [], colors = [];
-        for (let i = 0, j = 0; i <= Math.max(width, height); i += cell) {
+        const vertices = [], colors = []
+        const max = Math.max(width, height)
+        for (let i = 0, j = 0; i <= max; i += cell) {
             if (i <= height) {
-                vertices.push(0, i, 0, width, i, 0);
-                const color = i === height / 2 || i == 0 || i == height ? colorMain : colorSub;
+                vertices.push(0-width/2, i-height/2, 0, width/2, i-height/2, 0);
+                const color = i * 2 === height || i === 0 || i === height ? colorMain : colorSub;
                 color.toArray(colors, j); j += 3;
                 color.toArray(colors, j); j += 3;
             }
             if (i <= width) {
-                vertices.push(i, 0, 0, i, height, 0);
-                const color = i === width / 2 || i == 0 || i == width ? colorMain : colorSub;
+                vertices.push(i-width/2, 0-height/2, 0, i-width/2, height/2, 0);
+                const color = i * 2 === width || i === 0 || i === width ? colorMain : colorSub;
                 color.toArray(colors, j); j += 3;
                 color.toArray(colors, j); j += 3;
             }

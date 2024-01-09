@@ -1,39 +1,20 @@
 import * as THREE from 'three'
 
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
-import { generateUUID } from 'three/src/math/MathUtils.js';
-import RoundPlane from './three_helpers/rounded';
-
+import { generateUUID, degToRad } from 'three/src/math/MathUtils.js';
 import Loader from './three_helpers/loader'
+import Rect from './three_helpers/rect';
 
-function toVec(a) {
-    return new THREE.Vector3(...a)
-}
-
-function toRad(x) {
-    return Math.PI * x / 180
-}
-
-function toDeg(x) {
-    return Math.round(x * 180 / Math.PI)
-}
-
-function addLineShape(shape, color, x, y, z, rx, ry, rz, s) {
-
-    // lines
-    shape.autoClose = true;
-
-    const points = shape.getPoints();
-    const geometryPoints = new THREE.BufferGeometry().setFromPoints(points);
-    // solid line
-    let line = new THREE.Line(geometryPoints, new THREE.LineBasicMaterial({ color: color }));
-    line.position.set(x, y, z - 25);
-    line.rotation.set(rx, ry, rz);
-    line.scale.set(s, s, s);
-    return line
-}
-
+/**
+ * 物体元信息，用于构建 THREE.Object3D
+ */
 export default class MetaObject {
+    static ctx = {
+        mode: '2d', // 展示模式 2d/3d
+        edit: false, // 是否启用编辑
+        /** @type {Loader} 模型加载器 */
+        loader: new Loader()
+    }
 
     constructor(...metas) {
         let t = Object.assign({}, ...metas.map(x => x || {}))
@@ -41,151 +22,132 @@ export default class MetaObject {
         this.category = t.category // 模板类别
         this.tid = t.tid // 模板id
         this.tname = t.tname // 模板名称
-
-        this.name = t.name || this.tname // 物体标签
         this.showLabel = t.showLabel || false // 是否显示标签
+
+        this.size = t.size || [1, 1, 1] // 整体大小
 
         this.model2d = t.model2d // 平面模型
         this.rotate2d = t.rotate2d || [0, 0, 0] // 平面模型旋转角度
-        this.color = t.color || '#aaaaaa' // 平面物体颜色
-        this.textColor = t.textColor || '#333333' // 文本颜色
 
         this.model3d = t.model3d // 立体模型
         this.rotate3d = t.rotate3d || [0, 0, 0] // 立体模型旋转角度
 
-        this.rotate = t.rotate || [0, 0, 0] // 物体旋转角度
-        this.size = t.size || [1, 1, 1]
-
-        this.id = t.id || generateUUID() // 物体 id
-
+        // 当没有模型时，将构建平面/立方体
+        this.color = t.color || '#ffffff' // 平面物体颜色
+        this.textColor = t.textColor || '#333333' // 文本颜色
         this.isTemplate = t.isTemplate || false // 是否为模板
+        if (this.isTemplate) this.name = this.tname
+
+        // 下面这些是物体才有的属性
+        this.id = t.id || generateUUID() // 物体 id
+        this.name = t.name || this.tname // 物体标签
+        /** @type {number[]} */
+        this.rotate = t.rotate || [0, 0, 0] // 物体旋转角度
 
         /** @type {THREE.Object3D}  */
-        this.group = new THREE.Group() // 物体组
-        this.group.meta = this
-
-        this.group.position.set(...(t.position || [0, 0, 0]))
+        this.object3d = new THREE.Group() // 物体组
+        this.object3d.position.set(...(t.position || [0, 0, 0]))
         /** @type {THREE.Vector3} */
-        this.position = this.group.position
-    }
+        this.position = this.object3d.position
 
-    toTemplate = () => {
-        return {
-            category: this.category, tid: this.tid, tname: this.tname,
-            showLabel: this.showLabel,
-            model2d: this.model2d, rotate2d: this.rotate2d,
-            model3d: this.model3d, rotate3d: this.rotate3d,
-            color: this.color, size: this.size,
-            isTemplate: true
-        }
-    }
-
-    toJson = () => {
-        return Object.assign({}, this.toTemplate(), {
-            id: this.id, name: this.name,
-            position: [...this.position.toArray()],
-            rotate: this.rotate,
-            isTemplate: false
-        })
+        this.object3d.meta = this
+        this.rect = null // 用于 highlight
     }
 
     /**
-     * 构建 Object3D 对象
-     * Group [
-     * Box, // 碰撞体积
-     * Text, Model2D, Model3D
-     * ]
-     * @param {Object} ctx 
-     * @param {string} ctx.mode 模式 2d/3d
-     * @param {Loader} ctx.loader 模型加载器
-     * @param {boolean} ctx.edit 是否为编辑模式
-     * @returns {THREE.Group}
+     * fitting object to this size
+     * @param {THREE.Object3D} object
      */
-    build = async ({ mode, loader, edit = false }) => {
-        this.group.clear()
+    fitting = async (object, size) => {
+        let min = Math.min(...(size || this.size))
+        let box = new THREE.Box3().setFromObject(object)
+        let scalar = min / Math.max(...box.max.sub(box.min).toArray())
+        if (scalar < 1)
+            object.scale.multiplyScalar(scalar)
+    }
+
+    /**
+     * 构建 Object3D
+     * async 用于加载模型
+     * @returns {THREE.Object3D}
+     */
+    build = async () => {
+        const { mode, edit, loader } = MetaObject.ctx
+
+        this.object3d.visible = true
+        if (!edit && this.isTemplate) {
+            this.object3d.visible = false
+        }
 
         const is3d = mode === '3d'
+        const [width, height, z] = [this.size[0], this.size[1], this.size[2]]
 
-        let group = this.group
-
-        let model2d = this.#build2d(await loader.load(this.model2d))
-        let model3d = this.#build3d(await loader.load(this.model3d))
-
-        const maxLen = Math.max(this.size[0], this.size[1])
-
-        // 碰撞体积
-        let box;
-        if (mode === '3d') box = MetaObject.buildBox(this.size, this.color)
-        else {
-            box = MetaObject.buildRect(this.size[0], this.size[1], this.color, !edit)
-            box.position.z += 0.1
-        }
-        if (edit) {
-            // 编辑模式，必显示碰撞体积
-            box.visible = true
-        } else if (model2d || model3d) {
-            box.visible = false
-        }
-        box._visible = box.visible
-
-        group.add(box)
-        let name = this.isTemplate ? this.tname : this.name
-        let text = MetaObject.buildText(name,
-            await loader.loadFont(), 0.6, this.textColor)
-        text.visible = box.visible && (this.showLabel || this.isTemplate)
-        text.rotation.set(...this.rotate.map(x => -toRad(x)))
-        function strLen(str) {
-            var count = 0;
-            for (let i = 0, len = str.length; i < len; i++)
-                count += str.charCodeAt(i) < 256 ? 1 : 2;
-            return count;
-        }
-        let len = strLen(name)
-        let textScale = 1
-        if (len > Math.min(this.size[0], this.size[1]) && !this.isTemplate) {
-            textScale = Math.min(this.size[0], this.size[1]) / len * 1.5
-            text.scale.multiplyScalar(textScale)
-        }
-        text.position.set(-this.size[0] / 2 + 0.2 * textScale, this.size[1] / 2 - 0.9 * textScale,
-            is3d ? this.size[2] : 0.2)
-        group.add(text)
-
-        if (mode === '2d') {
-            if (model2d) group.add(model2d)
-            else if (model3d) {
-                group.add(model3d)
-            }
-        } else if (mode === '3d') {
-            if (model3d || model2d) group.add(model3d || model2d)
-        }
-
+        const group = this.getObject3D()
         group.scale.set(1, 1, 1)
-        group.rotation.set(...this.rotate.map(toRad))
-        this.position.z = 0 // 不考虑 z 轴，默认所有都落地
-        group.position.set(this.position.x, this.position.y, 0)
+        group.clear()
+        this.rect = null
 
-        var rect = null
-        if (this.isTemplate) {
-            // 模板只有在编辑模式才显示
-            this.group.visible = edit
-            // 将文本置于模型底部
-            text.position.set(-1.8, -2.3, 0)
-            // 限制模型大小到 2 以下
-            rect = MetaObject.buildRect(4.5, 4.5, 0x999999)
-            rect.position.y -= 0.5
-            if (maxLen > 2) {
-                group.scale.multiplyScalar(2 / maxLen)
-                text.scale.multiplyScalar(maxLen / 2)
-                text.position.multiplyScalar(maxLen / 2)
-                rect.scale.multiplyScalar(maxLen / 2)
-                rect.position.multiplyScalar(maxLen / 2)
-            }
-
-            group.add(rect)
+        // 构建文字
+        if (this.showLabel) {
+            const text = MetaObject.buildText(this.name || this.tname, 
+                    await loader.loadFont(), 0.5, this.textColor)
+            // 调整文字以 fit 到 box 里
+            this.fitting(text)
+            text.position.set(
+                -width / 2 + 0.2 * text.scale.x, 
+                height / 2 - 1 * text.scale.y, 
+                is3d ? z : 0.4)
+            text.rotation.set(...this.rotate.map(x => -degToRad(x)))
+            group.add(text)
         }
-        if (!is3d) {
+
+        // 构建模型
+        let model = null
+        if (is3d) {
+            model = this.#build3d(await loader.load(this.model3d))
+            if (!model) model = this.#build2d(await loader.load(this.model2d))
+            if (edit || !model) {
+                let rect = MetaObject.buildBox(this.size, this.color)
+                group.add(rect)
+            }
+        } else {
+            model = this.#build2d(await loader.load(this.model2d))
+            if (!model) model = this.#build3d(await loader.load(this.model3d))
+            if (edit || !model) {
+                let rect = Rect(width, height, 0, this.textColor, this.color, true, true)
+                rect.position.z = 0.1
+                group.add(rect)
+            }
+            if (model) model.position.z = 0.3
             group.scale.z = 0.1
         }
+        if (model) group.add(model)
+
+        group.rotation.set(...this.rotate.map(degToRad))
+
+        if (this.isTemplate) {
+            const object3d = group.clone()
+            group.clear()
+
+            // 限制模板的模型大小到 2
+            this.fitting(object3d, [2, 2, 2])
+            object3d.position.set(0, 0, 0)
+            group.add(object3d)
+
+            // 显示模板名称
+            let text = MetaObject.buildText(this.tname,
+                await loader.loadFont(), 0.6, '#333333')
+            text.position.set(-2, -2.3, 0)
+            group.add(text)
+
+            // 显示外圈
+            let rect = Rect(4.5, 4.5, 0, 0x999999, 0x333333, true, false)
+            rect.position.y -= 0.5
+            group.add(rect)
+        } else {
+            group.position.set(...this.position.toArray())
+        }
+
         return group
     }
 
@@ -194,15 +156,16 @@ export default class MetaObject {
      * @param {string} color 
      */
     highlight = (color) => {
-        this.group.children[0].visible = true
-        let mesh = this.group.children[0]
-        if (!('material' in mesh)) mesh = mesh.children[0]
-        mesh.material.color.set(color)
+        this.delight()
+        let group = this.getObject3D()
+        this.rect = Rect(this.size[0], this.size[1], 0, color, this.color, true, false)
+        if (this.isTemplate) this.fitting(this.rect, [2, 2, 2])
+        this.rect.position.z = 0.2
+        group.add(this.rect)
     }
 
     delight = () => {
-        this.highlight(this.color)
-        this.group.children[0].visible = this.group.children[0]._visible
+        if (this.rect) this.getObject3D().remove(this.rect)
     }
 
 
@@ -225,30 +188,6 @@ export default class MetaObject {
         return text
     }
 
-    static buildRect(width, height, color, showPlane = false) {
-        const points = []
-        points.push(new THREE.Vector3(-width / 2, -height / 2, 0))
-        points.push(new THREE.Vector3(-width / 2, height / 2, 0))
-        points.push(new THREE.Vector3(width / 2, height / 2, 0))
-        points.push(new THREE.Vector3(width / 2, -height / 2, 0))
-        points.push(new THREE.Vector3(-width / 2, -height / 2, 0))
-        let line = new THREE.Line(
-            new THREE.BufferGeometry().setFromPoints(points),
-            new THREE.LineBasicMaterial({ color: color, linewidth: 2 })
-        )
-
-        const plane = new THREE.Mesh(
-            new THREE.PlaneGeometry(width, height),
-            new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.5, visible: showPlane }))
-
-        let group = new THREE.Group()
-        group.add(
-            line,
-            plane
-        )
-        return group
-    }
-
     #build2d = (map) => {
         if (!map) return null
         const material = new THREE.SpriteMaterial({ map: map, color: 0xffffff });
@@ -259,18 +198,51 @@ export default class MetaObject {
 
     #build3d = (model) => {
         if (!model) return null
-
         /** @type {THREE.Object3D} */
         let object = model.scene.clone()
-
-        if (this.rotate3d) object.rotation.set(...this.rotate3d.map(toRad))
+        if (this.rotate3d) object.rotation.set(...this.rotate3d.map(degToRad))
         // shrink to size
-        let box = new THREE.Box3().setFromObject(object)
-        let size = box.max.sub(box.min)
-        const scalar = Math.min(this.size[0], this.size[1]) / Math.max(size.x, size.y)
-        object.scale.multiplyScalar(scalar)
-        object.position.z = size.z / 2 * scalar
+        this.fitting(object)
         return object
+    }
+
+    /**
+     * 返回作为模板时的属性
+     * @returns {Object}
+     */
+    toTemplate = () => {
+        return {
+            category: this.category, tid: this.tid, tname: this.tname,
+            showLabel: this.showLabel,
+            model2d: this.model2d, rotate2d: this.rotate2d,
+            model3d: this.model3d, rotate3d: this.rotate3d,
+            color: this.color, size: this.size,
+            isTemplate: true
+        }
+    }
+
+    /**
+     * 返回作为 Object 时的属性
+     * @returns {Object}
+     */
+    toJson = () => {
+        return Object.assign({}, this.toTemplate(), {
+            id: this.id, name: this.name,
+            position: [...this.position.toArray()],
+            rotate: this.rotate,
+            isTemplate: false
+        })
+    }
+
+    /**
+     * @returns {THREE.Object3D}
+     */
+    getObject3D = () => {
+        return this.object3d
+    }
+
+    static setContext(ctx) {
+        MetaObject.ctx = ctx
     }
 }
 
