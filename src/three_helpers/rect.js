@@ -64,7 +64,7 @@ export default function Rect(width, height, radius = 0, borderColor = '#333333',
     if (showPlane) {
         const plane = new THREE.Mesh(
             new THREE.PlaneGeometry(width, height),
-            new THREE.MeshBasicMaterial({ color: planeColor || 0xffffff, visible: showPlane })
+            new THREE.MeshBasicMaterial({ color: planeColor || 0xffffff, opacity: 0.8, transparent: true, visible: showPlane })
         )
         group.add(plane)
     }

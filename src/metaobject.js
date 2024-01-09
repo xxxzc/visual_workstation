@@ -92,11 +92,11 @@ export default class MetaObject {
             const text = MetaObject.buildText(this.name || this.tname, 
                     await loader.loadFont(), 0.5, this.textColor)
             // 调整文字以 fit 到 box 里
-            this.fitting(text)
+            this.fitting(text, this.size.slice(0, 2))
             text.position.set(
                 -width / 2 + 0.2 * text.scale.x, 
                 height / 2 - 1 * text.scale.y, 
-                is3d ? z : 0.4)
+                is3d ? z : 1)
             text.rotation.set(...this.rotate.map(x => -degToRad(x)))
             group.add(text)
         }

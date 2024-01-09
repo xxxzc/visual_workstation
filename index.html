@@ -99,6 +99,7 @@
             <a-tooltip v-show="edit" placement="bottomLeft" title="撤销修改">
                 <a-button shape="circle" icon="undo" @click="buildScene"></a-button>
             </a-tooltip>
+            <!-- <a-spin :spinning="loading"></a-spin> -->
         </div>
         <a-popover title="楼层信息">
         <template slot="content">
@@ -136,7 +137,7 @@
                 @click="setObject(null)">关闭(esc)</a-button>
             <div v-if="edit" class="space" style="margin-top: 4px; gap: 10px; justify-content: space-between;">
                 <div v-if="edit">
-                    <a-button type="primary" @click="newObject">{{meta.isTemplate ? '添加物体' : '复制物体'}}</a-button>
+                    <a-button type="primary" @click="newObject">{{meta.isTemplate ? '添加物体' : '复制物体'}} <a-icon :type="'arrow-'+copyDirection"></a-icon></a-button>
                     <a-button type="primary" @click="newTemplate">{{meta.isTemplate ? '复制模板' : '作为模板'}}</a-button>
                     <a-button icon="delete" @click="onDelete"></a-button>
                 </div>
@@ -262,7 +263,7 @@
                 </div>
                 <div v-if="meta.isTemplate" class="space">
                     <a-button @click="applyToAll">
-                        应用模型到所有关联物体
+                        应用到所有关联物体
                     </a-button>
                 </div>
             </div>

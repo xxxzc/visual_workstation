@@ -12,16 +12,22 @@ const globalControl = new Vue({
             path: []
         },
         objects: scene.objects,
-        searchValue: ""
+        searchValue: "",
+        loading: false
     },
     watch: {
-        mode() {
-            scene.switchMode(this.mode)
+        async mode() {
+            this.loading = true
+            await scene.switchMode(this.mode)
+            this.loading = false
         }
     },
     computed: {
         sortedObjects() {
-            let objects = this.objects
+            let objects = this.objects.filter(x => {
+                if (!this.edit && x.meta.isTemplate) return false
+                return true
+            })
             if (this.searchValue) {
                 let input = this.searchValue.toLowerCase()
                 objects = objects.filter(
@@ -67,26 +73,30 @@ const globalControl = new Vue({
          * 加载完数据或者点击Undo时，重新构建场景
          * @param {Event} e 
          */
-        buildScene(e) {
+        async buildScene(e) {
             if (e) e.target.blur()
             this.changed = false // 构建场景说明使用的是服务器的数据
-            scene.build(this.data, {
+            this.loading = true
+            await scene.build(this.data, {
                 mode: this.mode,
                 edit: this.edit,
                 didChange: this.didChange
             })
+            this.loading = false
         },
         applyChange() {
             this.buildScene()
             this.didChange()
         },
         async load() {
+            this.loading = true
             let result = await Promise.all([
                 fetch("http://localhost:8000/data"),
                 scene.loader.loadFont() // 加载字体很慢，预先加载
             ])
             this.data = await result[0].json()
             this.buildScene()
+            this.loading = false
             this.$message.success('加载成功');
         },
         async save(e) {
@@ -123,10 +133,12 @@ const globalControl = new Vue({
         unselect() {
             scene.panel.setObject(null)
         },
-        changeEdit(e) {
+        async changeEdit(e) {
             if (e) e.target.blur()
             this.edit = !this.edit
-            scene.toggleEdit(this.edit)
+            this.loading = true
+            await scene.toggleEdit(this.edit)
+            this.loading = false
         },
         didChange() {
             this.changed = true

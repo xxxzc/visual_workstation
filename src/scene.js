@@ -61,7 +61,7 @@ export default class Scene {
         const objectControl = this.objectControl
         objectControl.size = 0.3
         objectControl.showZ = false
-        objectControl.translationSnap = 0.25
+        objectControl.translationSnap = 0.1
         objectControl.rotationSnap = 0.25 / Math.PI
         objectControl.setScaleSnap(0.5)
         objectControl.space = 'local'
@@ -85,7 +85,8 @@ export default class Scene {
                     /** @type {MetaObject}  */
                     meta: null,
                     edit: true,
-                    model3ds: []
+                    model3ds: [],
+                    copyDirection: 'right'
                 }
             },
             methods: {
@@ -110,10 +111,16 @@ export default class Scene {
                     that.didChange()
                     let meta = this.meta.isTemplate ? this.meta.toTemplate() : this.meta.toJson()
                     meta.position = this.object.position.toArray()
-                    if (this.meta.isTemplate) meta.position[0] -= meta.position[0]
+                    if (this.meta.isTemplate) meta.position[0] = -that.size[0]/2-meta.size[0]/2
                     else {
-                        let i = meta.rotate[2] > 0 && meta.rotate[2] % 90 === 0 ? 1 : 0
-                        meta.position[i] += this.meta.size[i]
+                        if (this.copyDirection === 'left')
+                            meta.position[0] -= this.meta.size[0]
+                        else if (this.copyDirection === 'right')
+                            meta.position[0] += this.meta.size[0]
+                        else if (this.copyDirection === 'up')
+                            meta.position[1] -= this.meta.size[1]
+                        else if (this.copyDirection === 'down')
+                            meta.position[1] += this.meta.size[1]
                     }
                     meta.id = ''
                     meta.isTemplate = false
@@ -141,7 +148,7 @@ export default class Scene {
                         pointer = this.object.position.clone().project(that.camera)
                     }
                     let [x, y] = [(pointer.x + 1) / 2 * window.innerWidth, (1 - pointer.y) / 2 * window.innerHeight]
-                    this.$el.style.left = (x + 20) + 'px'
+                    this.$el.style.left = (x + 30) + 'px'
                     this.$el.style.top = (y - 15) + 'px'
                 },
                 async applyToAll() {
@@ -154,6 +161,7 @@ export default class Scene {
                                 x.meta.rotate3d = this.meta.rotate3d
                                 x.meta.model3d = this.meta.model3d
                                 x.meta.tname = this.meta.tname
+                                x.meta.size = this.meta.size
                                 return x.meta.build()
                             }
                             return null
@@ -170,8 +178,13 @@ export default class Scene {
         })
 
         document.addEventListener("keydown", (event) => {
+            console.log(event.key)
             if (event.key === "Escape") {
                 if (this.panel.object) this.panel.setObject(null)
+            }
+            if (event.key === 'ArrowUp' || event.key === 'ArrowDown'
+                || event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                this.panel.copyDirection = event.key.replace('Arrow', '').toLowerCase()
             }
         })
     }
@@ -216,6 +229,7 @@ export default class Scene {
         // 轨道控制器，控制场景的缩放、旋转和移动
         const orbitControl = this.orbitControl
         orbitControl.enablePan = true
+        orbitControl.target.set(0, 0, 0)
         orbitControl.update()
 
         // 加载所有模型
@@ -261,6 +275,7 @@ export default class Scene {
         // 编辑模式显示网格
         scene.remove(this.grid)
         const grid = this.grid = new Grid(width, height, {})
+        grid.position.z = 0.01
         if (edit) scene.add(grid)
 
         // 展示模式显示平面
@@ -276,7 +291,7 @@ export default class Scene {
         // }
         const geometry = new THREE.PlaneGeometry(width, height, width, height)
         const plane = this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial())
-        this.plane.visible = !edit
+        // this.plane.visible = !edit
         scene.add(this.plane)
 
         // 物体移动控制器
