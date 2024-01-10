@@ -9,6 +9,8 @@ import MetaObject from './metaobject.js'
 import Grid from './three_helpers/grid.js'
 import Loader from './three_helpers/loader.js'
 import { generateUUID } from 'three/src/math/MathUtils.js';
+import models from './three_helpers/models.js';
+import commonTemplates from './templates.js';
 
 export default class Scene {
 
@@ -27,16 +29,21 @@ export default class Scene {
 
         this.loader = new Loader() // 模型加载器
 
-        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000)
+        // 相机
+        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000)
         this.camera.up.set(0,0,1)
+
+        // 场景，所有物体都要加入到场景 scene 中
         this.scene = new THREE.Scene()
         this.scene.background = new THREE.Color(0xf0f0f0)
 
         this.buildLight() // 灯光
 
+        // 渲染器
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
         // this.renderer.setAnimationLoop(this.render)
 
+        // 视角控制器
         this.orbitControl = new OrbitControls(this.camera, this.renderer.domElement)
         this.orbitControl.addEventListener('change', this.render)
         this.isOrbiting = false
@@ -57,9 +64,10 @@ export default class Scene {
         document.addEventListener('pointermove', this.onPointerMove)
         window.addEventListener('resize', this.onWindowResize)
 
+        // 物体控制器
         this.objectControl = new TransformControls(this.camera, this.renderer.domElement)
         const objectControl = this.objectControl
-        objectControl.size = 0.3
+        objectControl.size = 0.4
         objectControl.showZ = false
         objectControl.translationSnap = 0.1
         objectControl.rotationSnap = 0.25 / Math.PI
@@ -70,12 +78,17 @@ export default class Scene {
             this.orbitControl.enabled = !event.value
         })
         objectControl.addEventListener('mouseUp', (event) => {
+            if (this.curObject) {
+                this.curObject.meta.position[0] = this.curObject.position.x
+                this.curObject.meta.position[1] = this.curObject.position.y
+            }
             this.didChange()
         })
 
         document.body.appendChild(this.renderer.domElement)
 
         const that = this
+        // 物体面板
         this.panel = new Vue({
             el: "#objectPanel",
             data() {
@@ -83,17 +96,26 @@ export default class Scene {
                     /** @type {THREE.Object3D}   */
                     object: null,
                     /** @type {MetaObject}  */
-                    meta: null,
+                    meta: new MetaObject(),
                     edit: true,
                     model3ds: [],
-                    copyDirection: 'right'
+                    copyDirection: 'right',
+                    selectAttr: null,
+                    attrs: {
+                        size: '大小(m)', color: '物体颜色', textColor: '文字颜色',
+                        model3d: '3D模型', rotate3d: '旋转3D',
+                        model2d: '2D模型', rotate2d: '旋转2D',
+                        tname: '模板名称', category: '所属分类',
+                        positionZ: '位置(高)', inCount: '参与统计', showLabel: '显示名称'
+                    }
                 }
             },
             methods: {
                 setObject(object) {
                     if (this.object === object) return
                     this.object = object
-                    if (!object) {
+                    if (!object || (!this.edit && object.meta.isTemplate)) {
+                        this.object = null
                         that.detachObject()
                         return
                     }
@@ -102,15 +124,13 @@ export default class Scene {
                     this.movePanel()
                 },
                 async applyChange() {
-                    that.didChange()
                     await this.meta.build()
                     that.render()
+                    that.didChange()
                 },
                 async newObject() {
                     if (!this.object) return
-                    that.didChange()
                     let meta = this.meta.isTemplate ? this.meta.toTemplate() : this.meta.toJson()
-                    meta.position = this.object.position.toArray()
                     if (this.meta.isTemplate) meta.position[0] = -that.size[0]/2-meta.size[0]/2
                     else {
                         if (this.copyDirection === 'left')
@@ -118,55 +138,62 @@ export default class Scene {
                         else if (this.copyDirection === 'right')
                             meta.position[0] += this.meta.size[0]
                         else if (this.copyDirection === 'up')
-                            meta.position[1] -= this.meta.size[1]
-                        else if (this.copyDirection === 'down')
                             meta.position[1] += this.meta.size[1]
+                        else if (this.copyDirection === 'down')
+                            meta.position[1] -= this.meta.size[1]
                     }
                     meta.id = ''
                     meta.isTemplate = false
                     that.detachObject(this.object)
                     this.setObject(await that.addObject(meta))
+                    that.didChange()
                 },
                 async newTemplate() {
                     if (!this.object) return
-                    that.didChange()
                     let meta = this.meta.toTemplate()
                     meta.id = ''
                     meta.isTemplate = true
                     that.detachObject(this.object)
                     this.setObject(await that.addTemplate(meta))
+                    that.didChange()
                 },
                 onDelete() {
                     if (!this.object) return
-                    that.didChange()
                     that.removeObject(this.object)
                     this.object = null
+                    that.didChange()
                 },
-                movePanel(pointer) {
+                async movePanel(pointer) {
                     if (!pointer) {
                         if (!this.object) return
                         pointer = this.object.position.clone().project(that.camera)
                     }
+                    await this.$nextTick()
                     let [x, y] = [(pointer.x + 1) / 2 * window.innerWidth, (1 - pointer.y) / 2 * window.innerHeight]
+                    if (x + this.$el.offsetWidth + 30 > window.innerWidth) {
+                        x = x - this.$el.offsetWidth - 60
+                    }
+                    if (y + this.$el.offsetHeight > window.innerHeight) {
+                        y = window.innerHeight - this.$el.offsetHeight
+                    }
                     this.$el.style.left = (x + 30) + 'px'
                     this.$el.style.top = (y - 15) + 'px'
                 },
                 async applyToAll() {
                     await this.applyChange()
+                    if (!this.selectAttr) return
                     await Promise.all(that.objects.map(
                         x => {
                             if (!x.meta.isTemplate && x.meta.tid === this.meta.tid) {
-                                x.meta.rotate2d = this.meta.rotate2d
-                                x.meta.model2d = this.meta.model2d
-                                x.meta.rotate3d = this.meta.rotate3d
-                                x.meta.model3d = this.meta.model3d
-                                x.meta.tname = this.meta.tname
-                                x.meta.size = this.meta.size
+                                if (this.selectAttr === 'positionZ') {
+                                    x.meta.position[2] = this.meta.position[2]
+                                } else x.meta[this.selectAttr] = this.meta[this.selectAttr]
                                 return x.meta.build()
                             }
                             return null
                         }
                     ))
+                    that.didChange()
                     that.render()
                 },
                 async get3dModels() {
@@ -180,11 +207,14 @@ export default class Scene {
         document.addEventListener("keydown", (event) => {
             console.log(event.key)
             if (event.key === "Escape") {
-                if (this.panel.object) this.panel.setObject(null)
+                this.panel.setObject(null)
             }
             if (event.key === 'ArrowUp' || event.key === 'ArrowDown'
                 || event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
                 this.panel.copyDirection = event.key.replace('Arrow', '').toLowerCase()
+            }
+            if (event.key === 'Delete') {
+                this.panel.onDelete()
             }
         })
     }
@@ -201,14 +231,6 @@ export default class Scene {
      * @param {boolean} ctx.edit
      */
     async build({ size, objects, templates, model3ds }, { didChange, mode = "2d", edit = false }) {
-        if (objects.length === 0 && templates.length === 0) {
-            templates.push({
-                "category": "Room", "tid": "Room", "tname": "房间",
-                "showLabel": true, "color": "#aaaaaa", "size": [4, 4, 4],
-                "isTemplate": true
-            })
-        }
-
         this.size = size
         const width = size[0]
         const height = size[1]
@@ -244,6 +266,11 @@ export default class Scene {
 
         this.templates = {}
         await Promise.all(templates.map(x => this.addTemplate(x)))
+        // 加载默认的模板
+        for await (let template of commonTemplates) {
+            if (!this.templates[template.tid])
+                await this.addTemplate(template)
+        }
         await Promise.all(objects.map(x => this.addObject(x)))
 
         this.toggleEdit(edit)
@@ -290,8 +317,11 @@ export default class Scene {
         //     const plane = this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: false }))
         // }
         const geometry = new THREE.PlaneGeometry(width, height, width, height)
-        const plane = this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial())
+        const plane = this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial(
+            { color: '#ffffff' }
+        ))
         // this.plane.visible = !edit
+        plane.position.z = -0.01
         scene.add(this.plane)
 
         // 物体移动控制器
@@ -303,9 +333,8 @@ export default class Scene {
         await this.switchMode(this.mode)
 
         scene.remove(this.templateTitle)
-        this.templateTitle = MetaObject.buildText("模板列表",
-            await this.loader.loadFont(), 1, 0x333333)
-        this.templateTitle.position.set(-width/2-13, height/2 - 2, 0)
+        this.templateTitle = models.text("模板列表", await this.loader.loadFont(), 1, '#333333')
+        this.templateTitle.position.set(-width/2-11, height/2 - 3, 0)
         if (edit) scene.add(this.templateTitle)
 
         this.render()
@@ -336,9 +365,9 @@ export default class Scene {
         this.templates[meta.tid] = JSON.parse(JSON.stringify(meta))
         let object = await this.addObject(Object.assign({}, meta, {
             position: [
-                i % 2 == 0 ? -this.size[0]/2-11 : -this.size[0]/2-6, 
+                i % 2 == 0 ? -this.size[0]/2-9 : -this.size[0]/2-4, 
                 this.size[1]/2 - Math.floor(i / 2) * 5 - 6, 
-                0
+                meta.position[2] || 0
             ],
             isTemplate: true
         }))
@@ -350,7 +379,7 @@ export default class Scene {
         if (this.curObject === object) return
         this.detachObject()
         this.curObject = object
-        object.meta.highlight('#FCE911')
+        object.meta.highlight('#FFA600')
         // this.panel.setObject(object)
         this.panel.movePanel()
         if (!object.meta.isTemplate) this.objectControl.attach(object)
@@ -386,7 +415,7 @@ export default class Scene {
     lookAtObject = (object) => {
         if (!object) return
         this.camera.position.set(...object.position.toArray())
-        this.camera.position.z = 20
+        this.camera.position.z = 30
         this.orbitControl.target.set(...object.position.toArray())
         this.panel.setObject(object)
         this.render()

@@ -14,175 +14,15 @@
     "ground": "",
     "templates": [
         {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": true
-        },
-        {
-            "category": "Appliance",
-            "tid": "MicroWave",
-            "tname": "\u5fae\u6ce2\u7089",
-            "showLabel": false,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                0,
-                0,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                0.4,
-                0.3,
-                0.3
-            ],
-            "isTemplate": true
-        },
-        {
-            "category": "Door",
-            "tid": "8020d8f75173-447e-b02d-e131e5a7e7bc",
-            "tname": "\u95e8",
-            "showLabel": false,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/WallDoorway.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1,
-                1,
-                3
-            ],
-            "isTemplate": true
-        },
-        {
-            "category": "Appliance",
-            "tid": "aae930c8fddf-416e-b983-7c1ad361a69e",
-            "tname": "\u996e\u6c34\u673a",
-            "showLabel": false,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/WaterCooler.glb",
-            "rotate3d": [
-                90,
-                0,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1,
-                1,
-                1
-            ],
-            "isTemplate": true
-        },
-        {
-            "category": "Room",
-            "tid": "Office",
-            "tname": "\u529e\u516c\u5ba4",
-            "showLabel": true,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                0,
-                0,
-                0
-            ],
-            "color": "#ffffff",
-            "size": [
-                4,
-                4,
-                3
-            ],
-            "isTemplate": true
-        },
-        {
-            "category": "Room",
-            "tid": "Room",
-            "tname": "\u623f\u95f4",
-            "showLabel": true,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                0,
-                0,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                4,
-                4,
-                3
-            ],
-            "isTemplate": true
-        },
-        {
-            "category": "Elevator",
-            "tid": "Elevator",
-            "tname": "\u7535\u68af",
-            "showLabel": true,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                66,
-                30,
-                60
-            ],
-            "color": "#fafafa",
-            "size": [
-                2,
-                2,
-                3
-            ],
-            "isTemplate": true
-        },
-        {
             "category": "Path",
-            "tid": "c6c5b818cb38-4e66-ad5f-af89b276eeb6",
+            "tid": "Path",
             "tname": "\u8fc7\u9053",
-            "showLabel": true,
+            "showLabel": false,
+            "position": [
+                -35,
+                20,
+                0
+            ],
             "rotate2d": [
                 0,
                 0,
@@ -197,17 +37,284 @@
             "size": [
                 2,
                 2,
-                0.1
+                1
             ],
-            "isTemplate": true
-        }
-    ],
-    "objects": [
+            "isTemplate": true,
+            "inCount": true
+        },
+        {
+            "category": "Room",
+            "tid": "Room",
+            "tname": "\u623f\u95f4",
+            "showLabel": true,
+            "position": [
+                -30,
+                20,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#CBF3E7",
+            "size": [
+                4,
+                4,
+                3
+            ],
+            "isTemplate": true,
+            "inCount": true
+        },
+        {
+            "category": "Room",
+            "tid": "Office",
+            "tname": "\u529e\u516c\u5ba4",
+            "showLabel": true,
+            "position": [
+                -35,
+                15,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#DCE4F1",
+            "size": [
+                4,
+                4,
+                3
+            ],
+            "isTemplate": true,
+            "inCount": true
+        },
+        {
+            "category": "Room",
+            "tid": "MeetingRoom",
+            "tname": "\u4f1a\u8bae\u5ba4",
+            "showLabel": true,
+            "position": [
+                -30,
+                15,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFEDCC",
+            "size": [
+                5,
+                3,
+                3
+            ],
+            "isTemplate": true,
+            "inCount": true
+        },
+        {
+            "category": "Path",
+            "tid": "c11a1717221d43edbfff6cd9221dd2a5",
+            "tname": "\u529e\u516c\u533a\u57df",
+            "showLabel": true,
+            "position": [
+                -35,
+                10,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#F3FCCA",
+            "size": [
+                11,
+                11,
+                1
+            ],
+            "isTemplate": true,
+            "inCount": true
+        },
+        {
+            "category": "Room",
+            "tid": "LumberRoom",
+            "tname": "\u6742\u7269\u95f4",
+            "showLabel": true,
+            "position": [
+                -30,
+                10,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#999999",
+            "size": [
+                3,
+                4,
+                3
+            ],
+            "isTemplate": true,
+            "inCount": true
+        },
+        {
+            "category": "Room",
+            "tid": "Toilet",
+            "tname": "\u6d17\u624b\u95f4",
+            "showLabel": true,
+            "position": [
+                -35,
+                5,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#D3EAFF",
+            "size": [
+                4,
+                4,
+                3
+            ],
+            "isTemplate": true,
+            "inCount": true
+        },
+        {
+            "category": "Room",
+            "tid": "FireExit",
+            "tname": "\u6d88\u9632\u901a\u9053",
+            "showLabel": true,
+            "position": [
+                -30,
+                5,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFD9D9",
+            "size": [
+                5,
+                3,
+                3
+            ],
+            "isTemplate": true,
+            "inCount": true
+        },
+        {
+            "category": "Box",
+            "tid": "3b1fdd941dd94003828ccdf61258e0fc",
+            "tname": "\u9ed1\u76d2",
+            "showLabel": false,
+            "position": [
+                -35,
+                0,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#999999",
+            "size": [
+                4,
+                4,
+                3
+            ],
+            "isTemplate": true,
+            "inCount": false
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -30,
+                0,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": true,
+            "inCount": true
+        },
         {
             "category": "Door",
             "tid": "8020d8f75173-447e-b02d-e131e5a7e7bc",
             "tname": "\u95e8",
             "showLabel": false,
+            "position": [
+                -35,
+                -5,
+                0
+            ],
             "rotate2d": [
                 0,
                 0,
@@ -225,827 +332,79 @@
                 1,
                 3
             ],
-            "isTemplate": false,
-            "id": "55359e8e-dd8a-4f74-a8e9-ff4e8c4d98fc",
-            "name": "\u95e8",
-            "position": [
-                -12.999999999999996,
-                20,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                90
-            ]
+            "isTemplate": true,
+            "inCount": false
         },
         {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
+            "category": "Appliance",
+            "tid": "aae930c8fddf-416e-b983-7c1ad361a69e",
+            "tname": "\u996e\u6c34\u673a",
             "showLabel": false,
-            "model2d": "",
+            "position": [
+                -30,
+                -5,
+                0
+            ],
             "rotate2d": [
                 0,
                 0,
                 0
             ],
-            "model3d": "model/Desk.glb",
+            "model3d": "model/WaterCooler.glb",
             "rotate3d": [
                 90,
-                180,
+                0,
                 0
             ],
             "color": "#fafafa",
             "size": [
-                1.4,
-                1,
-                1.5
+                0.5,
+                0.5,
+                1
             ],
-            "isTemplate": false,
-            "id": "bbe418f4-6b64-402c-ad6e-6bcffbfdc91e",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -23.5,
-                17.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
+            "isTemplate": true,
+            "inCount": true
         },
         {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
+            "category": "Appliance",
+            "tid": "MicroWave",
+            "tname": "\u5fae\u6ce2\u7089",
             "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "7abb8439-2285-4a30-812a-e169ebcea12c",
-            "name": "\u5de5\u4f4d",
             "position": [
-                -20.700000000000003,
-                17.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "bc131081-437a-4346-9c25-7d2960ecdb5f",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -19.3,
-                17.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "3e37ee21-8454-4af3-a69d-b7419354daf8",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -17.900000000000002,
-                17.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "e09d4fe0-b6a7-4188-b816-75345cb16edf",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -16.5,
-                17.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "c79c93c1-4178-46dc-86f1-8fbe598eb14e",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -15.100000000000001,
-                17.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "d743e880-08d0-4c5c-b515-9506498e157f",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -13.700000000000001,
-                17.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "b713b997-84c9-4983-a74b-dea072b9ff9a",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -22.1,
-                17.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "fa264b85-cf18-41c3-b5d1-adddb768b545",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -23.8,
-                14.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "7805e182-c47f-457a-b7a6-3aa4a6a8b28d",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -22.400000000000002,
-                14.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "8c17b965-e3f6-4a28-887a-8329e31e2170",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -21.000000000000004,
-                14.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "89fdeb61-1062-451b-bcf0-f22480d1f9ff",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -19.600000000000005,
-                14.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "67c412f4-8f85-4669-afa8-178a5e1d564c",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -18.200000000000006,
-                14.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "f34554b4-f330-41ca-a9e0-6b6b2ddcb8b7",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -16.800000000000008,
-                14.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "1f425c81-0760-4c1c-9af7-7250471ec96f",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -15.400000000000007,
-                14.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Seat",
-            "tid": "Seat",
-            "tname": "\u5de5\u4f4d",
-            "showLabel": false,
-            "model2d": "",
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Desk.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1.4,
-                1,
-                1.5
-            ],
-            "isTemplate": false,
-            "id": "b66f0b08-1798-4dfa-a86d-39260b2dc359",
-            "name": "\u5de5\u4f4d",
-            "position": [
-                -23.8,
-                15.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                180
-            ]
-        },
-        {
-            "category": "Room",
-            "tid": "Office",
-            "tname": "\u529e\u516c\u5ba4",
-            "showLabel": true,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                0,
-                0,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                6,
-                4,
-                3
-            ],
-            "isTemplate": false,
-            "id": "6abea6bc-f003-4a28-8c97-31324ba8203f",
-            "name": "\u529e\u516c\u5ba4\u5de61",
-            "position": [
-                -8,
-                23,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Room",
-            "tid": "Room",
-            "tname": "\u623f\u95f4",
-            "showLabel": true,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                0,
-                0,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                12,
-                7,
-                3
-            ],
-            "isTemplate": false,
-            "id": "280c6b13-2078-4940-9bfa-0f3e5313c5d4",
-            "name": "\u623f\u95f4\u5de61",
-            "position": [
-                -19,
-                21.5,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Room",
-            "tid": "Room",
-            "tname": "\u623f\u95f4",
-            "showLabel": true,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                0,
-                0,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                12,
-                6,
-                3
-            ],
-            "isTemplate": false,
-            "id": "0b6df2e8-658b-4c82-97e5-aca6642d5196",
-            "name": "\u623f\u95f4\u5de62",
-            "position": [
-                -19,
-                15,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Elevator",
-            "tid": "Elevator",
-            "tname": "\u7535\u68af",
-            "showLabel": true,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                66,
-                30,
-                60
-            ],
-            "color": "#fafafa",
-            "size": [
-                2,
-                2,
-                3
-            ],
-            "isTemplate": false,
-            "id": "868219ef-bf9e-4db3-a09c-552c5d3b8b31",
-            "name": "\u7535\u68af1",
-            "position": [
-                2.5,
-                -13,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Elevator",
-            "tid": "Elevator",
-            "tname": "\u7535\u68af",
-            "showLabel": true,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                66,
-                30,
-                60
-            ],
-            "color": "#fafafa",
-            "size": [
-                2,
-                2,
-                3
-            ],
-            "isTemplate": false,
-            "id": "40312b21-edfe-4718-ac4e-0c4f61a49866",
-            "name": "\u7535\u68af2",
-            "position": [
-                -2.5,
-                -13,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Elevator",
-            "tid": "Elevator",
-            "tname": "\u7535\u68af",
-            "showLabel": true,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                66,
-                30,
-                60
-            ],
-            "color": "#fafafa",
-            "size": [
-                2,
-                2,
-                3
-            ],
-            "isTemplate": false,
-            "id": "03dcb9a2-c2fa-4be2-87bf-04c4495a3e02",
-            "name": "\u7535\u68af3",
-            "position": [
-                2.5,
+                -35,
                 -10,
                 0
             ],
-            "rotate": [
+            "rotate2d": [
                 0,
                 0,
                 0
-            ]
+            ],
+            "model3d": "model/Microwave.glb",
+            "rotate3d": [
+                90,
+                null,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                0.5,
+                0.5,
+                0.5
+            ],
+            "isTemplate": true,
+            "inCount": true
         },
         {
             "category": "Elevator",
             "tid": "Elevator",
             "tname": "\u7535\u68af",
             "showLabel": true,
+            "position": [
+                -30,
+                -10,
+                0
+            ],
             "rotate2d": [
                 0,
                 0,
@@ -1056,31 +415,27 @@
                 30,
                 60
             ],
-            "color": "#fafafa",
+            "color": "#FFD9D9",
             "size": [
                 2,
                 2,
                 3
             ],
-            "isTemplate": false,
-            "id": "723748bc-a557-413f-b296-20baee0c03f2",
-            "name": "\u7535\u68af5",
-            "position": [
-                -2.5,
-                -10,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
+            "isTemplate": true,
+            "inCount": true
+        }
+    ],
+    "objects": [
         {
             "category": "Path",
-            "tid": "c6c5b818cb38-4e66-ad5f-af89b276eeb6",
+            "tid": "Path",
             "tname": "\u8fc7\u9053",
-            "showLabel": true,
+            "showLabel": false,
+            "position": [
+                0,
+                0,
+                5.0000000000000016e-05
+            ],
             "rotate2d": [
                 0,
                 0,
@@ -1098,13 +453,9 @@
                 0.1
             ],
             "isTemplate": false,
+            "inCount": false,
             "id": "875a0c6c-5b1b-4e3b-ab4b-fe8298d077f5",
-            "name": "\u8d70\u9053",
-            "position": [
-                0,
-                0,
-                0
-            ],
+            "name": "\u8fc7\u9053",
             "rotate": [
                 0,
                 0,
@@ -1113,68 +464,34 @@
         },
         {
             "category": "Path",
-            "tid": "c6c5b818cb38-4e66-ad5f-af89b276eeb6",
+            "tid": "Path",
             "tname": "\u8fc7\u9053",
-            "showLabel": true,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                0,
-                0,
-                0
-            ],
-            "color": "#f0f0f0",
-            "size": [
-                10,
-                6,
-                0.1
-            ],
-            "isTemplate": false,
-            "id": "c3cec7a3-aac9-4d40-b781-2478c3d2d359",
-            "name": "\u8d70\u9053",
-            "position": [
-                0,
-                22,
-                0
-            ],
-            "rotate": [
-                0,
-                0,
-                0
-            ]
-        },
-        {
-            "category": "Path",
-            "tid": "c6c5b818cb38-4e66-ad5f-af89b276eeb6",
-            "tname": "\u8fc7\u9053",
-            "showLabel": true,
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                0,
-                0,
-                0
-            ],
-            "color": "#f0f0f0",
-            "size": [
-                10,
-                6,
-                0.1
-            ],
-            "isTemplate": false,
-            "id": "4118a3a7-144b-4668-8f83-2225f60593b6",
-            "name": "\u8d70\u9053",
+            "showLabel": false,
             "position": [
                 0,
                 -22,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
                 0
             ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#f0f0f0",
+            "size": [
+                10,
+                6,
+                0.1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "4118a3a7-144b-4668-8f83-2225f60593b6",
+            "name": "\u8fc7\u9053",
             "rotate": [
                 0,
                 0,
@@ -1183,9 +500,14 @@
         },
         {
             "category": "Path",
-            "tid": "c6c5b818cb38-4e66-ad5f-af89b276eeb6",
+            "tid": "Path",
             "tname": "\u8fc7\u9053",
-            "showLabel": true,
+            "showLabel": false,
+            "position": [
+                -12,
+                0,
+                0.0005000000000000001
+            ],
             "rotate2d": [
                 0,
                 0,
@@ -1203,13 +525,9 @@
                 0.1
             ],
             "isTemplate": false,
+            "inCount": false,
             "id": "cef2b145-8a1e-4098-a678-10ce0899bed2",
             "name": "\u8fc7\u9053",
-            "position": [
-                -12,
-                0,
-                0
-            ],
             "rotate": [
                 0,
                 0,
@@ -1218,9 +536,14 @@
         },
         {
             "category": "Path",
-            "tid": "c6c5b818cb38-4e66-ad5f-af89b276eeb6",
+            "tid": "Path",
             "tname": "\u8fc7\u9053",
-            "showLabel": true,
+            "showLabel": false,
+            "position": [
+                -8,
+                20,
+                0.0005000000000000001
+            ],
             "rotate2d": [
                 0,
                 0,
@@ -1238,13 +561,2808 @@
                 0.1
             ],
             "isTemplate": false,
+            "inCount": false,
             "id": "14ae91a9-f238-4ce3-9ad2-cf67c60697e7",
             "name": "\u8fc7\u9053",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Path",
+            "tid": "Path",
+            "tname": "\u8fc7\u9053",
+            "showLabel": false,
             "position": [
                 -8,
-                20,
+                -20,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
                 0
             ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#f0f0f0",
+            "size": [
+                6,
+                2,
+                0.1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "a84bc3b5-3928-4014-a3c1-2610ec2580f2",
+            "name": "\u8fc7\u9053",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Path",
+            "tid": "Path",
+            "tname": "\u8fc7\u9053",
+            "showLabel": false,
+            "position": [
+                -6.25,
+                7,
+                5.000000000000002e-06
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#f0f0f0",
+            "size": [
+                9.5,
+                2,
+                0.1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "8477f202-d55b-4a1b-8128-e638020eb422",
+            "name": "\u8fc7\u9053",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Path",
+            "tid": "Path",
+            "tname": "\u8fc7\u9053",
+            "showLabel": false,
+            "position": [
+                12,
+                0,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#f0f0f0",
+            "size": [
+                2,
+                50,
+                0.1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "bf0de72b-353a-46b9-b63f-4e69fec61faf",
+            "name": "\u8fc7\u9053",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Path",
+            "tid": "Path",
+            "tname": "\u8fc7\u9053",
+            "showLabel": false,
+            "position": [
+                8,
+                -20,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#f0f0f0",
+            "size": [
+                6,
+                2,
+                0.1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "de66a20f-cae7-41d0-a119-116f69da728a",
+            "name": "\u8fc7\u9053",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Path",
+            "tid": "Path",
+            "tname": "\u8fc7\u9053",
+            "showLabel": false,
+            "position": [
+                8,
+                20,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#f0f0f0",
+            "size": [
+                6,
+                2,
+                0.1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "3c85f1f3-24fc-4605-ac4c-9d80b8bc36d9",
+            "name": "\u8fc7\u9053",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Path",
+            "tid": "Path",
+            "tname": "\u8fc7\u9053",
+            "showLabel": false,
+            "position": [
+                6.2,
+                -7,
+                5.000000000000002e-06
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#f0f0f0",
+            "size": [
+                9.5,
+                2,
+                0.1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "4f7323c1-f3e6-4b37-a84d-920236762e2e",
+            "name": "\u8fc7\u9053",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Path",
+            "tid": "Path",
+            "tname": "\u8fc7\u9053",
+            "showLabel": false,
+            "position": [
+                3.7,
+                7,
+                5.000000000000002e-06
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#f0f0f0",
+            "size": [
+                4.5,
+                2,
+                0.1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "faaf8ca2-06c8-460b-a2d9-e678bf043d2c",
+            "name": "\u8fc7\u9053",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Path",
+            "tid": "Path",
+            "tname": "\u8fc7\u9053",
+            "showLabel": false,
+            "position": [
+                -4.2,
+                -7,
+                5.000000000000002e-06
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#f0f0f0",
+            "size": [
+                5.5,
+                2,
+                0.1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "34c62cbb-da66-4c29-ad5a-9ac5ebf19a19",
+            "name": "\u8fc7\u9053",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Path",
+            "tid": "Path",
+            "tname": "\u8fc7\u9053",
+            "showLabel": true,
+            "position": [
+                0,
+                22,
+                5.0000000000000016e-05
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#f0f0f0",
+            "size": [
+                10,
+                6,
+                0.1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "c3cec7a3-aac9-4d40-b781-2478c3d2d359",
+            "name": "\u516c\u5171\u533a\u57df",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Office",
+            "tname": "\u529e\u516c\u5ba4",
+            "showLabel": true,
+            "position": [
+                -8,
+                23,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#DCE4F1",
+            "size": [
+                6,
+                4,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "6abea6bc-f003-4a28-8c97-31324ba8203f",
+            "name": "\u529e\u516c\u5ba41209",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Room",
+            "tname": "\u623f\u95f4",
+            "showLabel": true,
+            "position": [
+                -19,
+                21.5,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#CBF3E7",
+            "size": [
+                12,
+                7,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "280c6b13-2078-4940-9bfa-0f3e5313c5d4",
+            "name": "\u623f\u95f41210",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Room",
+            "tname": "\u623f\u95f4",
+            "showLabel": true,
+            "position": [
+                -19,
+                15,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#CBF3E7",
+            "size": [
+                12,
+                6,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "0b6df2e8-658b-4c82-97e5-aca6642d5196",
+            "name": "\u623f\u95f4 1211",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "MeetingRoom",
+            "tname": "\u4f1a\u8bae\u5ba4",
+            "showLabel": true,
+            "position": [
+                -8.5,
+                17.5,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFEDCC",
+            "size": [
+                5,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "b43237e1-f29b-4e23-aa7c-70d7cb172911",
+            "name": "\u4f1a\u8bae\u5ba41212",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "MeetingRoom",
+            "tname": "\u4f1a\u8bae\u5ba4",
+            "showLabel": true,
+            "position": [
+                -8.5,
+                14,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFEDCC",
+            "size": [
+                5,
+                4,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "0d764f09-32fa-4186-9511-7e449b2a5f8c",
+            "name": "\u4f1a\u8bae\u5ba41213",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Path",
+            "tid": "c11a1717221d43edbfff6cd9221dd2a5",
+            "tname": "\u529e\u516c\u533a\u57df",
+            "showLabel": true,
+            "position": [
+                -19,
+                -0.30000000000000004,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#F3FCCA",
+            "size": [
+                12,
+                25,
+                1
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "d9ac55e6-e4b0-48e4-a925-8eb603c19fd0",
+            "name": "\u529e\u516c\u533a\u57df",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Room",
+            "tname": "\u623f\u95f4",
+            "showLabel": true,
+            "position": [
+                -19,
+                -23.5,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#CBF3E7",
+            "size": [
+                12,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "0b436dcf-14c8-49db-9a69-7dd917ed1689",
+            "name": "\u623f\u95f41218",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Room",
+            "tname": "\u623f\u95f4",
+            "showLabel": true,
+            "position": [
+                -19,
+                -18.95,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#CBF3E7",
+            "size": [
+                12,
+                6,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "27dafc71-2dd8-45a2-9bd8-e49d912d96f6",
+            "name": "\u623f\u95f41217",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Room",
+            "tname": "\u623f\u95f4",
+            "showLabel": true,
+            "position": [
+                -19,
+                -14.450000000000001,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#CBF3E7",
+            "size": [
+                12,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "1ecb4938-5e69-43cd-bffb-742a07e5fe63",
+            "name": "\u623f\u95f41215",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Office",
+            "tname": "\u529e\u516c\u5ba4",
+            "showLabel": true,
+            "position": [
+                8,
+                -23,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#DCE4F1",
+            "size": [
+                6,
+                4,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "c560e3ed-bba1-4197-9639-6191cd23d3e1",
+            "name": "\u529e\u516c\u5ba41201",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Path",
+            "tid": "c11a1717221d43edbfff6cd9221dd2a5",
+            "tname": "\u529e\u516c\u533a\u57df",
+            "showLabel": true,
+            "position": [
+                19,
+                0,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#F3FCCA",
+            "size": [
+                12,
+                50,
+                1
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "0883f438-be92-4050-80f4-4a683dbec926",
+            "name": "\u529e\u516c\u533a\u57df",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Office",
+            "tname": "\u529e\u516c\u5ba4",
+            "showLabel": true,
+            "position": [
+                22,
+                -23.5,
+                0.1
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#DCE4F1",
+            "size": [
+                6,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "89303d92-80e2-4789-8290-5c3a68c5d307",
+            "name": "\u529e\u516c\u5ba41202",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "LumberRoom",
+            "tname": "\u6742\u7269\u95f4",
+            "showLabel": true,
+            "position": [
+                9.5,
+                17,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#999999",
+            "size": [
+                3,
+                4,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "f76e6c69-677b-417e-98fd-75bb7b789efb",
+            "name": "1205",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "MeetingRoom",
+            "tname": "\u4f1a\u8bae\u5ba4",
+            "showLabel": true,
+            "position": [
+                -8,
+                -23,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFEDCC",
+            "size": [
+                6,
+                4,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "d6616fa5-586d-4807-8e8e-dde5c6a93c01",
+            "name": "\u4f1a\u8bae\u5ba41219",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "MeetingRoom",
+            "tname": "\u4f1a\u8bae\u5ba4",
+            "showLabel": true,
+            "position": [
+                -8.5,
+                -17,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFEDCC",
+            "size": [
+                5,
+                4,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "a995078c-2e0d-4bbc-9fc7-c1c04b8f1eda",
+            "name": "\u4f1a\u8bae\u5ba41216",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "MeetingRoom",
+            "tname": "\u4f1a\u8bae\u5ba4",
+            "showLabel": true,
+            "position": [
+                -8.5,
+                -13.5,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFEDCC",
+            "size": [
+                5,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "180476a6-a7af-46f9-b150-846740d51a3e",
+            "name": "\u4f1a\u8bae\u5ba41214",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "MeetingRoom",
+            "tname": "\u4f1a\u8bae\u5ba4",
+            "showLabel": true,
+            "position": [
+                8.5,
+                -13.5,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFEDCC",
+            "size": [
+                5,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "efda2aac-0c9f-44aa-95f3-4dad0f08d400",
+            "name": "\u4f1a\u8bae\u5ba41203",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "MeetingRoom",
+            "tname": "\u4f1a\u8bae\u5ba4",
+            "showLabel": true,
+            "position": [
+                8.5,
+                13.5,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFEDCC",
+            "size": [
+                5,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "c4727ad7-95be-4844-b866-8daf0fd9f463",
+            "name": "\u4f1a\u8bae\u5ba41204",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "MeetingRoom",
+            "tname": "\u4f1a\u8bae\u5ba4",
+            "showLabel": true,
+            "position": [
+                8,
+                23,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFEDCC",
+            "size": [
+                6,
+                4,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "f28725a1-fc72-485e-b02a-bbc7860475da",
+            "name": "\u4f1a\u8bae\u5ba41207",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Office",
+            "tname": "\u529e\u516c\u5ba4",
+            "showLabel": true,
+            "position": [
+                22,
+                23.5,
+                0.1
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#DCE4F1",
+            "size": [
+                6,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "752e37b1-e1fc-43c3-829b-21b3524348d9",
+            "name": "\u529e\u516c\u5ba41206",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "LumberRoom",
+            "tname": "\u6742\u7269\u95f4",
+            "showLabel": true,
+            "position": [
+                7,
+                17,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#999999",
+            "size": [
+                2,
+                4,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "3ea21e60-2e48-46bc-9cb0-c8d294e313a4",
+            "name": "1208",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Room",
+            "tname": "\u623f\u95f4",
+            "showLabel": true,
+            "position": [
+                2.5,
+                9.5,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#CBF3E7",
+            "size": [
+                2,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "7b316aa4-68cf-4579-b2ee-98a4311467c4",
+            "name": "\u8336\u6c34\u95f4",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Toilet",
+            "tname": "\u6d17\u624b\u95f4",
+            "showLabel": true,
+            "position": [
+                6,
+                9.5,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#D3EAFF",
+            "size": [
+                5,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "7ddc2668-f88c-4369-8fd5-2b86a36e30be",
+            "name": "\u6d17\u624b\u95f4\uff08\u5973\uff09",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "Toilet",
+            "tname": "\u6d17\u624b\u95f4",
+            "showLabel": true,
+            "position": [
+                -4.2,
+                -9.5,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#D3EAFF",
+            "size": [
+                5.5,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "4535c1dd-f83b-401d-ae30-5fd76875e57e",
+            "name": "\u6d17\u624b\u95f4\uff08\u7537\uff09",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "FireExit",
+            "tname": "\u6d88\u9632\u901a\u9053",
+            "showLabel": true,
+            "position": [
+                -8.5,
+                9.5,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFD9D9",
+            "size": [
+                5,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "f9d1b093-6d4d-4dad-ada5-5bc99db3b0ab",
+            "name": "\u6d88\u9632\u901a\u9053",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Room",
+            "tid": "FireExit",
+            "tname": "\u6d88\u9632\u901a\u9053",
+            "showLabel": true,
+            "position": [
+                8.5,
+                -9.5,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#FFD9D9",
+            "size": [
+                5,
+                3,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "b34a78e8-a35d-445d-b0ea-e9ad17a6ecfc",
+            "name": "\u6d88\u9632\u901a\u9053",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Door",
+            "tid": "8020d8f75173-447e-b02d-e131e5a7e7bc",
+            "tname": "\u95e8",
+            "showLabel": false,
+            "position": [
+                -12.899999999999997,
+                19.900000000000006,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/WallDoorway.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1,
+                1,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "55359e8e-dd8a-4f74-a8e9-ff4e8c4d98fc",
+            "name": "\u95e8",
+            "rotate": [
+                0,
+                0,
+                90
+            ]
+        },
+        {
+            "category": "Appliance",
+            "tid": "aae930c8fddf-416e-b983-7c1ad361a69e",
+            "tname": "\u996e\u6c34\u673a",
+            "showLabel": false,
+            "position": [
+                4.200000000000003,
+                23.700000000000003,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/WaterCooler.glb",
+            "rotate3d": [
+                90,
+                0,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                0.5,
+                0.5,
+                1
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "8be41eff-edb3-483a-9b97-0b6b6e79bae6",
+            "name": "\u996e\u6c34\u673a",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Appliance",
+            "tid": "aae930c8fddf-416e-b983-7c1ad361a69e",
+            "tname": "\u996e\u6c34\u673a",
+            "showLabel": false,
+            "position": [
+                4.2,
+                23.200000000000003,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/WaterCooler.glb",
+            "rotate3d": [
+                90,
+                0,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                0.5,
+                0.5,
+                1
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "2f73506d-571c-4a93-b97c-f782db7fbdff",
+            "name": "\u996e\u6c34\u673a",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Appliance",
+            "tid": "aae930c8fddf-416e-b983-7c1ad361a69e",
+            "tname": "\u996e\u6c34\u673a",
+            "showLabel": false,
+            "position": [
+                4.2,
+                22.700000000000003,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/WaterCooler.glb",
+            "rotate3d": [
+                90,
+                0,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                0.5,
+                0.5,
+                1
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "21859865-54c0-4b88-8cd8-04abdac4cd4e",
+            "name": "\u996e\u6c34\u673a",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Appliance",
+            "tid": "aae930c8fddf-416e-b983-7c1ad361a69e",
+            "tname": "\u996e\u6c34\u673a",
+            "showLabel": false,
+            "position": [
+                4.2,
+                22.200000000000003,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/WaterCooler.glb",
+            "rotate3d": [
+                90,
+                0,
+                0
+            ],
+            "color": "#fafafa10",
+            "size": [
+                0.5,
+                0.5,
+                1
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "8977dd95-a3f4-4c65-925d-361983600b3d",
+            "name": "\u996e\u6c34\u673a",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -15.7,
+                12.800000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "d0e60511-825b-4ff0-aa75-da543a9836b9",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -17.099999999999998,
+                12.800000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "e24399df-4c63-4cd0-8a8d-e0aa0dffb9fd",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -18.499999999999996,
+                12.800000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "8693d4f0-579e-4729-868f-4f3a4418da31",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -19.899999999999995,
+                12.800000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "e36c62a0-560e-4e56-911e-6aff39a1bc35",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -21.299999999999994,
+                12.800000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "dfbd3df4-b795-4d09-8e9c-fdda36e7dc48",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -22.699999999999992,
+                12.800000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "7553369d-8e2c-47a2-b696-e1642a4fc353",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -24.09999999999999,
+                12.800000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "bebc5ca2-449d-46de-8a0b-b9f9274770b4",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -14.299999999999999,
+                12.800000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "0ecab1b5-323a-417e-ac9e-60ddb5d30379",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -14.999999999999998,
+                15.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "dfe6edca-de20-4202-8c6c-37eee1be0f9d",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -16.4,
+                15.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "44290929-debf-4631-8e70-2f7f3e440b51",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -17.799999999999997,
+                15.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "ff3e1e2a-4354-4caa-8bd6-0ac67d9f10d3",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -19.199999999999996,
+                15.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "adf377b8-153e-46df-861b-66c46e7934ac",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -20.599999999999994,
+                15.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "f4ea02a0-aa7a-412b-ae8b-137c90842e1f",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -21.999999999999993,
+                15.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "93de1de5-1c0c-41aa-96a2-9604df642ade",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -23.39999999999999,
+                15.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "578c5ae1-2ab7-4042-86ca-f6c0ec8a2ff4",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                180
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -14.999999999999998,
+                14.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "15170318-e7d3-49f3-8d90-a9cc9a6d9ff2",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -16.4,
+                14.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "a01e7308-9668-4d0f-a484-4675f1c31083",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -17.799999999999997,
+                14.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "3e147367-317a-495b-bace-1f01035705d8",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -19.199999999999996,
+                14.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "8ee58898-dd92-40e7-a4ef-7d8d39be8576",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -20.599999999999994,
+                14.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "1a621225-bd58-42b1-8ac4-e5b1f19b9ff9",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -21.999999999999993,
+                14.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "239b16e3-43e5-4ce6-b495-3adf42793698",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -23.39999999999999,
+                14.500000000000002,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "e537f1d5-c43f-4532-b46e-32dd6c5dc059",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -16.4,
+                17.1,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "9862a706-ac04-43b2-89d1-8f70f3788ebb",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -17.799999999999997,
+                17.1,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "678d52be-2657-4845-9cee-cff54485ea12",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -19.199999999999996,
+                17.1,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "1dd3cb26-16b8-4c93-91ec-58bc139b29a6",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -20.599999999999994,
+                17.1,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "b456931a-1b6c-4239-9ad8-cf6e7f2ce468",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -21.999999999999993,
+                17.1,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "a7e368f2-48ff-4bc1-88d6-f477ac917660",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -23.39999999999999,
+                17.1,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "15f61b84-cea0-46be-9a95-0e97aa8cee7c",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Seat",
+            "tid": "Seat",
+            "tname": "\u5de5\u4f4d",
+            "showLabel": false,
+            "position": [
+                -14.999999999999998,
+                17.1,
+                0.65
+            ],
+            "model2d": "",
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Desk.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1.4,
+                1,
+                1.5
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "86fe1b30-9b74-4e29-9016-ed512a1e1f6d",
+            "name": "\u5de5\u4f4d",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Box",
+            "tid": "3b1fdd941dd94003828ccdf61258e0fc",
+            "tname": "\u9ed1\u76d2",
+            "showLabel": false,
+            "position": [
+                -9.5,
+                4,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#999999",
+            "size": [
+                3,
+                4,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "f8a9882e-d392-4a7f-8846-1f3557a41661",
+            "name": "\u9ed1\u76d2",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Elevator",
+            "tid": "Elevator",
+            "tname": "\u7535\u68af",
+            "showLabel": true,
+            "position": [
+                2.5,
+                -17,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                66,
+                30,
+                60
+            ],
+            "color": "#FFD9D9",
+            "size": [
+                2,
+                2,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "868219ef-bf9e-4db3-a09c-552c5d3b8b31",
+            "name": "\u5ba2\u68af1",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Elevator",
+            "tid": "Elevator",
+            "tname": "\u7535\u68af",
+            "showLabel": true,
+            "position": [
+                -2.5,
+                -17,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                66,
+                30,
+                60
+            ],
+            "color": "#FFD9D9",
+            "size": [
+                2,
+                2,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "40312b21-edfe-4718-ac4e-0c4f61a49866",
+            "name": "\u5ba2\u68af2",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Elevator",
+            "tid": "Elevator",
+            "tname": "\u7535\u68af",
+            "showLabel": true,
+            "position": [
+                2.5,
+                -14,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                66,
+                30,
+                60
+            ],
+            "color": "#FFD9D9",
+            "size": [
+                2,
+                2,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "03dcb9a2-c2fa-4be2-87bf-04c4495a3e02",
+            "name": "\u5ba2\u68af3",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Elevator",
+            "tid": "Elevator",
+            "tname": "\u7535\u68af",
+            "showLabel": true,
+            "position": [
+                -2.5,
+                -14,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                66,
+                30,
+                60
+            ],
+            "color": "#FFD9D9",
+            "size": [
+                2,
+                2,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "723748bc-a557-413f-b296-20baee0c03f2",
+            "name": "\u5ba2\u68af5",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Elevator",
+            "tid": "Elevator",
+            "tname": "\u7535\u68af",
+            "showLabel": true,
+            "position": [
+                -7.050000000000001,
+                5,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                66,
+                30,
+                60
+            ],
+            "color": "#FFD9D9",
+            "size": [
+                2,
+                2,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "ddeacd4b-6cc3-4bee-9473-a60f0ecc83e6",
+            "name": "\u6d88\u9632\u7535\u68af",
+            "rotate": [
+                0,
+                0,
+                0
+            ]
+        },
+        {
+            "category": "Elevator",
+            "tid": "Elevator",
+            "tname": "\u7535\u68af",
+            "showLabel": true,
+            "position": [
+                7,
+                -5,
+                0.0005000000000000001
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                66,
+                30,
+                60
+            ],
+            "color": "#FFD9D9",
+            "size": [
+                2,
+                2,
+                3
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "6469df94-b5cd-45d2-88ca-4a0261eb6060",
+            "name": "\u6d88\u9632\u7535\u68af",
             "rotate": [
                 0,
                 0,

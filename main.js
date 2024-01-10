@@ -13,13 +13,17 @@ const globalControl = new Vue({
         },
         objects: scene.objects,
         searchValue: "",
-        loading: false
+        loading: false,
+        objectCounts: []
     },
     watch: {
         async mode() {
             this.loading = true
             await scene.switchMode(this.mode)
             this.loading = false
+        },
+        objects() {
+            this.doCount()
         }
     },
     computed: {
@@ -47,22 +51,6 @@ const globalControl = new Vue({
                     return c
                 }
             )
-        },
-        objectCounts() {
-            let counts = {}
-            for (let object of this.objects) {
-                if (object.meta.isTemplate) continue
-                let category = object.meta.tname
-                if (counts[category]) counts[category]++
-                else counts[category] = 1
-            }
-            let result = []
-            for (let [k, v] of Object.entries(counts)) {
-                result.push(
-                    { title: k + ' ' + v, key: k, children: [] }
-                )
-            }
-            return result
         }
     },
     created() {
@@ -77,11 +65,7 @@ const globalControl = new Vue({
             if (e) e.target.blur()
             this.changed = false // 构建场景说明使用的是服务器的数据
             this.loading = true
-            await scene.build(this.data, {
-                mode: this.mode,
-                edit: this.edit,
-                didChange: this.didChange
-            })
+            await scene.build(this.data, this)
             this.loading = false
         },
         applyChange() {
@@ -117,7 +101,8 @@ const globalControl = new Vue({
                 body: JSON.stringify(this.data)
             })
             this.changed = false
-            this.$message.success('提交成功');
+            this.$message.success('提交成功')
+            this.doCount()
         },
         handleSearch(value) {
             this.searchValue = value
@@ -142,6 +127,23 @@ const globalControl = new Vue({
         },
         didChange() {
             this.changed = true
+            this.doCount()
+        },
+        doCount() {
+            let counts = {}
+            for (let object of this.objects) {
+                if (object.meta.isTemplate || !object.meta.inCount) continue
+                let category = object.meta.tname
+                if (counts[category]) counts[category]++
+                else counts[category] = 1
+            }
+            let result = []
+            for (let [k, v] of Object.entries(counts)) {
+                result.push(
+                    { title: k + ' ' + v, key: k, children: [] }
+                )
+            }
+            this.objectCounts = [...result]
         }
     }
 })
