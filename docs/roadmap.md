@@ -2,7 +2,8 @@
 - 拆分构建到多个方法里
 - 按 esc 关闭面板和支持仅点击才显示面板 ok
 - 物体搜索功能 ok
-- 修改模板增加 applyToAll
+- 修改模板增加 applyToAll ok
+- 隐藏模板 id，增加选择器
 - ~~暂存~~和重置
 - 上传模型
 - 统计信息（category - name - size - num）

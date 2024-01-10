@@ -118,14 +118,14 @@ export default class MetaObject {
 
         // 构建文字
         if (this.showLabel) {
-            const text = models.text(this.isTemplate ? this.tname : this.name || this.tname, 
-                    await loader.loadFont(), 0.5, this.textColor)
-            
+            const text = models.text(this.isTemplate ? this.tname : this.name || this.tname,
+                await loader.loadFont(), 0.5, this.textColor)
+
             // 调整文字以 fit 到 box 里
-            this.fitting(text)
+            this.fitting(text, [width - 0.5, height - 0.5, z])
             text.position.set(
-                -width / 2 + 0.2 * text.scale.x, 
-                height / 2 - 1 * text.scale.y, 
+                -width / 2 + 0.2 * text.scale.x,
+                height / 2 - 1 * text.scale.y,
                 is3d ? z : 2)
             text.rotation.set(...this.rotate.map(x => -degToRad(x)))
             group.add(text)
@@ -135,19 +135,19 @@ export default class MetaObject {
         let model = null
         if (this.category === 'Path') {
             // 过道类型
-            model = models.plane(width, height, { color: this.color, opacity: edit ? 0.7 : 1 })
+            model = models.plane(width, height, { color: this.color, opacity: edit ? 0.8 : 1 })
             model.position.z = 0.01
         } else if (this.category === 'Room') {
             // 房间类型
             let boxBottom = models.box([width, 0.2, z], { color: this.color })
             let boxLeft = models.box([0.2, height, z], { color: this.color })
-            boxBottom.position.set(0, -height / 2 + 0.1, z/2)
+            boxBottom.position.set(0, -height / 2 + 0.1, z / 2)
             let boxTop = boxBottom.clone()
-            boxTop.position.set(0, height / 2 - 0.1, z/2)
-            boxLeft.position.set(-width / 2 + 0.1, 0, z/2)
+            boxTop.position.set(0, height / 2 - 0.1, z / 2)
+            boxLeft.position.set(-width / 2 + 0.1, 0, z / 2)
             let boxRight = boxLeft.clone()
-            boxRight.position.set(width / 2 - 0.1, 0, z/2)
-            let ground = models.plane(width, height, { color: this.color, opacity: 0.5 })
+            boxRight.position.set(width / 2 - 0.1, 0, z / 2)
+            let ground = models.plane(width, height, { color: this.color, opacity: 0.7 })
             model = new THREE.Group()
             model.add(
                 boxTop, boxBottom, boxLeft, boxRight, ground
@@ -157,17 +157,14 @@ export default class MetaObject {
             model = this.#build3d(await loader.load(this.model3d))
             if (!model) model = this.#build2d(await loader.load(this.model2d))
             if (!model) {
-                model = models.box(this.size, { color: this.color, opacity: 0.7 })
+                model = models.box(this.size, { color: this.color, opacity: edit ? 0.8 : 1 })
                 model.position.z = this.size[2] / 2 + 0.01
             }
         } else {
             model = this.#build2d(await loader.load(this.model2d))
             if (!model) model = this.#build3d(await loader.load(this.model3d))
             if (!model) {
-                let border = models.border(width, height, this.textColor)
-                let plane = models.plane(width, height, { color: this.color, opacity: 0.7 })
-                model = new THREE.Group()
-                model.add(border, plane)
+                model = models.plane(width, height, { color: this.color, opacity: edit ? 0.8 : 1 })
             }
             model.position.z = 0.01
         }
@@ -201,10 +198,12 @@ export default class MetaObject {
             // 显示外圈
             let border = models.border(4.5, 4.5, '#333333')
             border.position.y -= 0.5
+            border.position.z = -0.1
             let plane = models.plane(4.5, 4.5, { color: '#ffffff', opacity: 1 })
             plane.position.y -= 0.5
+            plane.position.z = -0.1
             group.add(border, plane)
-            group.position.z = 0
+            group.position.z = 0.01
         }
         this.render()
         return group
@@ -239,7 +238,7 @@ export default class MetaObject {
     highlight = (color) => {
         this.delight()
         let group = this.getObject3D()
-        this.border = models.border(this.size[0]+0.01, this.size[1]+0.01, color)
+        this.border = models.border(this.size[0], this.size[1], color)
         if (this.isTemplate) this.fitting(this.border, [2.5, 2.5, 2.5])
         this.border.position.z = 0.2
         group.add(this.border)

@@ -1,9 +1,10 @@
 import * as THREE from 'three'
-THREE.Object3D.DefaultUp = new THREE.Vector3(0,0,1)
+THREE.Object3D.DefaultUp = new THREE.Vector3(0, 0, 1)
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
+import { MapControls } from 'three/examples/jsm/controls/MapControls.js';
 
 import MetaObject from './metaobject.js'
 import Grid from './three_helpers/grid.js'
@@ -31,7 +32,7 @@ export default class Scene {
 
         // 相机
         this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000)
-        this.camera.up.set(0,0,1)
+        this.camera.up.set(0, 0, 1)
 
         // 场景，所有物体都要加入到场景 scene 中
         this.scene = new THREE.Scene()
@@ -44,7 +45,7 @@ export default class Scene {
         // this.renderer.setAnimationLoop(this.render)
 
         // 视角控制器
-        this.orbitControl = new OrbitControls(this.camera, this.renderer.domElement)
+        this.orbitControl = new MapControls(this.camera, this.renderer.domElement)
         this.orbitControl.addEventListener('change', this.render)
         this.isOrbiting = false
         this.orbitControl.addEventListener('start', () => {
@@ -69,7 +70,7 @@ export default class Scene {
         const objectControl = this.objectControl
         objectControl.size = 0.4
         objectControl.showZ = false
-        objectControl.translationSnap = 0.1
+        objectControl.translationSnap = 0.05
         objectControl.rotationSnap = 0.25 / Math.PI
         objectControl.setScaleSnap(0.5)
         objectControl.space = 'local'
@@ -131,7 +132,7 @@ export default class Scene {
                 async newObject() {
                     if (!this.object) return
                     let meta = this.meta.isTemplate ? this.meta.toTemplate() : this.meta.toJson()
-                    if (this.meta.isTemplate) meta.position[0] = -that.size[0]/2-meta.size[0]/2
+                    if (this.meta.isTemplate) meta.position[0] = -that.size[0] / 2 - meta.size[0] / 2
                     else {
                         if (this.copyDirection === 'left')
                             meta.position[0] -= this.meta.size[0]
@@ -334,7 +335,7 @@ export default class Scene {
 
         scene.remove(this.templateTitle)
         this.templateTitle = models.text("模板列表", await this.loader.loadFont(), 1, '#333333')
-        this.templateTitle.position.set(-width/2-11, height/2 - 3, 0)
+        this.templateTitle.position.set(-width / 2 - 11, height / 2 - 3, 0)
         if (edit) scene.add(this.templateTitle)
 
         this.render()
@@ -363,10 +364,11 @@ export default class Scene {
             meta.tid = generateUUID().replace(/\-/g, '')
         }
         this.templates[meta.tid] = JSON.parse(JSON.stringify(meta))
+        let idx = i % 3
         let object = await this.addObject(Object.assign({}, meta, {
             position: [
-                i % 2 == 0 ? -this.size[0]/2-9 : -this.size[0]/2-4, 
-                this.size[1]/2 - Math.floor(i / 2) * 5 - 6, 
+                -this.size[0] / 2 - 4 - 5 * idx,
+                this.size[1] / 2 - Math.floor(i / 3) * 5 - 6,
                 meta.position[2] || 0
             ],
             isTemplate: true
@@ -431,6 +433,10 @@ export default class Scene {
             let object = x.object
             let cnt = 10
             while (!object.meta && cnt--) object = object.parent
+            if (object && object === this.panel.object) {
+                minObject = object
+                size = 0
+            }
             if (cnt > 0 && object.meta.size[0] * object.meta.size[1] < size) {
                 size = object.meta.size[0] * object.meta.size[1]
                 minObject = object
@@ -465,6 +471,7 @@ export default class Scene {
         // ) {
         //     this.panel.setObject(this.curObject)
         // } else this.panel.setObject(null)
+
         this.panel.setObject(this.getIntersect())
     }
 
@@ -480,7 +487,7 @@ export default class Scene {
         }
 
         if (this.isOrbiting) return
- 
+
         // 指针远离选择物体时，自动隐藏
         const distance = this.getDistance()
         if (distance > 0.25 && !this.panel.object) this.detachObject()

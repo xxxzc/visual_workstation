@@ -85,66 +85,64 @@
             <a-tree :tree-data="objectCounts"></a-tree>
         </div>
         <dvi id="topBar">
-        <div id="leftTools" style="display: flex; align-items: center; gap: 10px; min-width: 20%;">
-            <a-tooltip placement="bottomLeft" title="红色表示您有未提交的修改，请及时保存哦">
-                <a-button :type="changed ? 'danger' : 'primary'" title="提交修改" shape="circle" icon="save" size="large"
-                    @click="save"></a-button>
-            </a-tooltip>
-            <a-radio-group v-model:value="mode">
-                <a-radio-button value="2d">2D</a-radio-button>
-                <a-radio-button value="3d">3D</a-radio-button>
-            </a-radio-group>
-            <a-tooltip placement="bottomLeft" title="编辑模式">
-                <a-button :type="edit ? 'primary' : ''" icon="edit" @click="changeEdit"></a-button>
-            </a-tooltip>
-            <a-tooltip v-show="edit" placement="bottomLeft" title="撤销修改">
-                <a-button shape="circle" icon="undo" @click="buildScene"></a-button>
-            </a-tooltip>
-            <!-- <a-spin :spinning="loading"></a-spin> -->
-        </div>
-        <a-popover title="楼层信息">
-        <template slot="content">
-            <div class="space">
-                <div class="form-label">大小(m)</div>
-                <div class="form-input">
-                    <div>横 <a-input-number :disabled="!edit" style="width: 60px;" v-model="data.size[0]" @change="applyChange"
-                            size="small"></a-input-number></div>
-                    <div>纵 <a-input-number :disabled="!edit" style="width: 60px;" v-model="data.size[1]" @change="applyChange"
-                            size="small"></a-input-number></div>
-                    <div>高 <a-input-number :disabled="!edit" style="width: 60px;" v-model="data.size[2]" @change="applyChange"
-                            size="small"></a-input-number></div>
-                </div>
+            <div id="leftTools" style="display: flex; align-items: center; gap: 10px; min-width: 20%;">
+                <a-tooltip placement="bottomLeft" title="红色表示您有未提交的修改，请及时保存哦">
+                    <a-button :type="changed ? 'danger' : 'primary'" title="提交修改" shape="circle" icon="save"
+                        size="large" @click="save"></a-button>
+                </a-tooltip>
+                <a-radio-group v-model:value="mode">
+                    <a-radio-button value="2d">2D</a-radio-button>
+                    <a-radio-button value="3d">3D</a-radio-button>
+                </a-radio-group>
+                <a-tooltip placement="bottomLeft" :title="edit ? '切换到浏览模式' : '切换到编辑模式'">
+                    <a-button :type="edit ? 'primary' : ''" icon="edit" @click="changeEdit"></a-button>
+                </a-tooltip>
+                <a-tooltip v-show="edit" placement="bottomLeft" title="重置">
+                    <a-button shape="circle" icon="undo" @click="buildScene"></a-button>
+                </a-tooltip>
+                <!-- <a-spin :spinning="loading"></a-spin> -->
             </div>
-        </template>
-        <a-button type="default">
-            <div id="centerTitle" v-if="data.path">{{(data.path||[]).join(' ')}}</div>
-        </a-button>
-        </a-popover>
-        <a-select
-            show-search allow-clear :filter-option="false"
-            placeholder="搜索" style="width: 240px"
-            @search="handleSearch" @select="select" @deselect="handleSearch('')">
-            <a-select-option v-for="obj in sortedObjects" :key="obj.meta.id" :value="obj.meta.id">
-                {{obj.meta.isTemplate ? '模板>' : ''}}{{obj.meta.tname}} <b>{{obj.meta.name}}</b>
-            </a-select-option>
-        </a-select>
+            <a-popover title="楼层信息">
+                <template slot="content">
+                    <div class="space">
+                        <div class="form-label">大小(m)</div>
+                        <div class="form-input">
+                            <div>横 <a-input-number :disabled="!edit" style="width: 60px;" v-model="data.size[0]"
+                                    @change="applyChange" size="small"></a-input-number></div>
+                            <div>纵 <a-input-number :disabled="!edit" style="width: 60px;" v-model="data.size[1]"
+                                    @change="applyChange" size="small"></a-input-number></div>
+                            <div>高 <a-input-number :disabled="!edit" style="width: 60px;" v-model="data.size[2]"
+                                    @change="applyChange" size="small"></a-input-number></div>
+                        </div>
+                    </div>
+                </template>
+                <a-button type="default">
+                    <div id="centerTitle" v-if="data.path">{{(data.path||[]).join(' ')}}</div>
+                </a-button>
+            </a-popover>
+            <a-select show-search allow-clear :filter-option="false" placeholder="搜索" style="width: 240px"
+                @search="handleSearch" @select="select" @deselect="handleSearch('')">
+                <a-select-option v-for="obj in sortedObjects" :key="obj.meta.id" :value="obj.meta.id">
+                    {{obj.meta.isTemplate ? '模板>' : ''}}{{obj.meta.tname}} <b>{{obj.meta.name}}</b>
+                </a-select-option>
+            </a-select>
         </dvi>
     </div>
     <!-- 物体面板 -->
     <div id="objectPanel" v-cloak1>
         <div class="card" v-if="object && meta">
             <a-button type="link" shape="circle" style="position: absolute; right: 16px;"
-                :style="{ top: edit ? '16px' : '4px' }"
-                @click="setObject(null)">关闭(esc)</a-button>
+                :style="{ top: edit ? '16px' : '4px' }" @click="setObject(null)">关闭(esc)</a-button>
             <div v-if="edit" class="space" style="margin-top: 4px; gap: 10px; justify-content: space-between;">
                 <div v-if="edit">
                     <a-button v-if="meta.isTemplate" type="primary" @click="newObject">添加物体</a-button>
                     <a-tooltip v-if="!meta.isTemplate" title="您可以通过方向键来设置复制方向">
-                    <a-button type="primary" @click="newObject">复制物体<a-icon :type="'arrow-'+copyDirection"></a-icon></a-button>
+                        <a-button type="primary" @click="newObject">复制物体<a-icon
+                                :type="'arrow-'+copyDirection"></a-icon></a-button>
                     </a-tooltip>
                     <a-button type="primary" @click="newTemplate">{{meta.isTemplate ? '复制模板' : '作为模板'}}</a-button>
                     <a-tooltip title="您可以按 Delete 键来删除物体">
-                    <a-button icon="delete" @click="onDelete"></a-button>
+                        <a-button icon="delete" @click="onDelete"></a-button>
                     </a-tooltip>
                 </div>
                 <!-- <a-button type="link" shape="circle" @click="setObject(null)">关闭(esc)</a-button> -->
@@ -161,7 +159,7 @@
                 </div>
                 <div class="form-label" @click="selectAttr = 'tname'">模板名称</div>
                 <div class="form-input" @click="selectAttr = 'tname'">
-                    <a-input :disabled="!edit || !meta.isTemplate" style="width: 100px;" v-model="meta.tname" size="small"
+                    <a-input :disabled="!meta.isTemplate" style="width: 100px;" v-model="meta.tname" size="small"
                         @change="applyChange" />
                 </div>
             </div>
@@ -173,33 +171,32 @@
                 </div>
                 <div class="form-label">模板ID</div>
                 <div class="form-input">
-                    <a-input :disabled="!edit" style="width: 100px;" v-model="meta.tid" size="small"
+                    <a-input :disabled="!edit || meta.isTemplate" style="width: 100px;" v-model="meta.tid" size="small"
                         @change="applyChange" />
                 </div>
             </div>
             <div v-if="!edit && meta.category === 'Seat'">
-            <div class="space">
-                <div class="form-label">员工姓名</div>
-                <div class="form-input">
-                    谢子聪
+                <div class="space">
+                    <div class="form-label">员工姓名</div>
+                    <div class="form-input">
+                        谢子聪
+                    </div>
+                    <div class="form-label">联系方式</div>
+                    <div class="form-input">
+                        191xxxx7868
+                    </div>
                 </div>
-                <div class="form-label">联系方式</div>
-                <div class="form-input">
-                    191xxxx7868
+                <div class="space">
+                    <div class="form-label">工位设备</div>
+                    <div class="form-input">
+                        <a-tag>显示器</a-tag><a-tag>台式机</a-tag>
+                    </div>
                 </div>
-            </div>
-            <div class="space">
-                <div class="form-label">工位设备</div>
-                <div class="form-input">
-                <a-tag>显示器</a-tag><a-tag>台式机</a-tag>
-                </div>
-            </div>
             </div>
             <div v-if="edit">
                 <div>
                     <b>{{meta.isTemplate ? '模板设置' : '物体设置'}}</b>
-                    <a-button v-if="meta.isTemplate && selectAttr" type="primary"
-                        @click="applyToAll" size="small">
+                    <a-button v-if="meta.isTemplate && selectAttr" type="primary" @click="applyToAll" size="small">
                         将 <b>{{attrs[selectAttr]}}</b> 应用到所有关联物体
                     </a-button>
                 </div>
@@ -207,35 +204,35 @@
                     <div class="form-label" @click="selectAttr = 'showLabel'">是否显示名称</div>
                     <div class="form-input" @click="selectAttr = 'showLabel'">
                         <a-switch v-model="meta.showLabel" @change="applyChange">
-                        </a-swich>
+                            </a-swich>
                     </div>
                     <div class="form-label" @click="selectAttr = 'inCount'">是否参与统计</div>
                     <div class="form-input" @click="selectAttr = 'inCount'">
                         <a-switch v-model="meta.inCount" @change="applyChange">
-                        </a-swich>
+                            </a-swich>
                     </div>
                 </div>
                 <div class="space" @click="selectAttr = 'size'">
                     <div class="form-label">大小(m)</div>
                     <div class="form-input">
-                        <div>横 <a-input-number style="width: 64px;" :max="100" v-model="meta.size[0]" @change="applyChange"
-                                size="small"></a-input-number></div>
-                        <div>纵 <a-input-number style="width: 64px;" :max="100" v-model="meta.size[1]" @change="applyChange"
-                                size="small"></a-input-number></div>
-                        <div>高 <a-input-number style="width: 64px;" :max="100" v-model="meta.size[2]" @change="applyChange"
-                                size="small"></a-input-number></div>
+                        <div>横 <a-input-number style="width: 64px;" :max="100" v-model="meta.size[0]"
+                                @change="applyChange" size="small"></a-input-number></div>
+                        <div>纵 <a-input-number style="width: 64px;" :max="100" v-model="meta.size[1]"
+                                @change="applyChange" size="small"></a-input-number></div>
+                        <div>高 <a-input-number style="width: 64px;" :max="100" v-model="meta.size[2]"
+                                @change="applyChange" size="small"></a-input-number></div>
                     </div>
                 </div>
                 <div class="space">
                     <div class="form-label">位置</div>
                     <div class="form-input">
                         <div>横 <a-input-number style="width: 64px;" :max="100" :disabled="meta.isTemplate"
-                            v-model="object.position.x" size="small"></a-input-number></div>
+                                v-model="object.position.x" size="small"></a-input-number></div>
                         <div>纵 <a-input-number style="width: 64px;" :max="100" :disabled="meta.isTemplate"
-                            v-model="object.position.y" size="small"></a-input-number></div>
+                                v-model="object.position.y" size="small"></a-input-number></div>
                         <div @click="selectAttr = 'positionZ'">
-                             高 <a-input-number style="width: 64px;" :max="100" 
-                             v-model="meta.position[2]" @change="applyChange" size="small"></a-input-number></div>
+                            高 <a-input-number style="width: 64px;" :max="100" v-model="meta.position[2]"
+                                @change="applyChange" size="small"></a-input-number></div>
                     </div>
                 </div>
                 <div class="space">
