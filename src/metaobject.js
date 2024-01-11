@@ -139,20 +139,42 @@ export default class MetaObject {
             model.position.z = 0.01
         } else if (this.category === 'Room') {
             // 房间类型
-            let boxBottom = models.box([width, 0.2, z], { color: this.color })
-            let boxLeft = models.box([0.2, height, z], { color: this.color })
-            boxBottom.position.set(0, -height / 2 + 0.1, z / 2)
+            const linewidth = 0.15
+            let boxBottom = models.box([width, linewidth, z], { color: this.color })
+            let boxLeft = models.box([linewidth, height, z], { color: this.color })
+            boxBottom.position.set(0, -height / 2 + linewidth/2, z / 2)
             let boxTop = boxBottom.clone()
-            boxTop.position.set(0, height / 2 - 0.1, z / 2)
-            boxLeft.position.set(-width / 2 + 0.1, 0, z / 2)
+            boxTop.position.set(0, height / 2 - linewidth/2, z / 2)
+            boxLeft.position.set(-width / 2 + linewidth/2, 0, z / 2)
             let boxRight = boxLeft.clone()
-            boxRight.position.set(width / 2 - 0.1, 0, z / 2)
-            let ground = models.plane(width, height, { color: this.color, opacity: 0.7 })
+            boxRight.position.set(width / 2 - linewidth/2, 0, z / 2)
+            let ground = models.plane(width, height, { color: this.color, opacity: 0.5 })
             model = new THREE.Group()
             model.add(
                 boxTop, boxBottom, boxLeft, boxRight, ground
             )
             model.position.z = 0.01
+        } else if (this.category === 'Seat') {
+            // 工位特别处理
+            model = new THREE.Group()
+            // desktop
+            let desktop = models.plane(width * 0.9, height * 0.4, { color: '#fefefe' })
+            desktop.position.y += height * 0.2
+            desktop.position.z = 0.1
+            // desktop border
+            let line = models.border(width * 0.9, height * 0.4, this.color)
+            line.position.y += height * 0.2
+            line.position.z = 0.2
+            let seat = models.plane(0.3, 0.2, { color: this.name === '工位' ? '#06C687' : '#175c99' })
+            // let seat = models.circular(0.15, this.name === '工位' ? '#06C687' : '#175c99')
+            seat.position.y -= 0.1
+            seat.position.z = 0.2
+            // seat status
+            // let seatStatus = models.circular(0.1, 
+            //     this.name === '工位' ? '#06C687' : '#279aff')
+            // seatStatus.position.set(-0.3, 0.3, 0.2)
+            // seat.rotateZ(degToRad(20))
+            model.add(desktop, line, seat)
         } else if (is3d) {
             model = this.#build3d(await loader.load(this.model3d))
             if (!model) model = this.#build2d(await loader.load(this.model2d))
@@ -171,6 +193,8 @@ export default class MetaObject {
         if (model) {
             group.add(model)
         }
+
+        group.add(models.plane(width, height, { visible: false }))
 
         group.rotation.set(...this.rotate.map(degToRad))
         group.position.set(...this.position)
@@ -196,13 +220,10 @@ export default class MetaObject {
             group.add(text)
 
             // 显示外圈
-            let border = models.border(4.5, 4.5, '#333333')
-            border.position.y -= 0.5
-            border.position.z = -0.1
             let plane = models.plane(4.5, 4.5, { color: '#ffffff', opacity: 1 })
             plane.position.y -= 0.5
             plane.position.z = -0.1
-            group.add(border, plane)
+            group.add(plane)
             group.position.z = 0.01
         }
         this.render()
@@ -236,11 +257,15 @@ export default class MetaObject {
      * @param {string} color 
      */
     highlight = (color) => {
+        color = color || '#FFFF33'
         this.delight()
         let group = this.getObject3D()
-        this.border = models.border(this.size[0], this.size[1], color)
+        this.border = new THREE.Group() 
+        this.border.add(
+            models.fatborder(this.size[0], this.size[1], color, 0.05 * Math.sqrt(Math.min(this.size[0], this.size[1])))
+        )
         if (this.isTemplate) this.fitting(this.border, [2.5, 2.5, 2.5])
-        this.border.position.z = 0.2
+        this.border.position.z = this.size[2]+0.1
         group.add(this.border)
         this.render()
     }

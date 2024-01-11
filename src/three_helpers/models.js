@@ -99,6 +99,35 @@ function border(width, height, color) {
     )
 }
 
+/**
+ * 绘制边框
+ * @param {number} width 
+ * @param {number} height 
+ * @param {any} color 
+ * @returns {THREE.Object3D}
+ */
+function fatborder(width, height, color, linewidth) {
+    linewidth = linewidth || 0.1
+    let planeL = plane(linewidth, height, { color })
+    let planeU = plane(width, linewidth, { color })
+    let planeR = planeL.clone()
+    let planeD = planeU.clone()
+    planeL.position.x = -width / 2 + linewidth / 2
+    planeR.position.x = width / 2 - linewidth / 2
+    planeU.position.y = height / 2 - linewidth / 2
+    planeD.position.y = -height / 2 + linewidth / 2
+    const line = new THREE.Group()
+    line.add(planeL, planeU, planeR, planeD)
+    return line
+}
+
+function circular(radius, color) {
+    const geometry = new THREE.CircleGeometry( radius, 32 )
+    const material = new THREE.MeshBasicMaterial( { color } )
+    const circle = new THREE.Mesh( geometry, material )
+    return circle
+}
+
 export default {
-    plane, box, text, border
+    plane, box, text, border, fatborder, circular
 }

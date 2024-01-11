@@ -73,6 +73,20 @@
         body::-webkit-scrollbar {
             display: none;
         }
+
+        .cnt-item {
+            box-sizing: border-box;
+            padding: 2px 6px;
+            margin: 2px 0px;
+            background-color: white;
+            border-radius: 4px;
+            cursor: default;
+        }
+
+        .cnt-item:hover {
+            background-color: #D3EAFF;
+            cursor: pointer;
+        }
     </style>
     <link rel="stylesheet" href="lib/antd.min.css">
 </head>
@@ -80,9 +94,11 @@
 <body bgcolor="#f0f0f0">
     <!-- 顶栏 -->
     <div id="globalControl" v-cloak0>
-        <div class="card" style="position: absolute; left: 10px; bottom: 10px; width: 130px;">
-            <div><b class="form-label">统计</b></div>
-            <a-tree :tree-data="objectCounts"></a-tree>
+        <div class="card" style="position: absolute; left: 10px; bottom: 10px; width: 120px; padding: 4px 8px;">
+            <div><b class="form-label" style="padding: 8px 4px;">统计</b></div>
+            <div class="cnt-item" v-for="cnt in objectCounts">
+                {{cnt.key}} <b style="float: right;">{{cnt.value}}</b>
+            </div>
         </div>
         <dvi id="topBar">
             <div id="leftTools" style="display: flex; align-items: center; gap: 10px; min-width: 20%;">
@@ -147,19 +163,27 @@
                 </div>
                 <!-- <a-button type="link" shape="circle" @click="setObject(null)">关闭(esc)</a-button> -->
             </div>
-            <div><b>{{meta.tname}}</b></div>
             <div class="space" hidden>
                 <span>主键</span> <a-input placeholder="id" v-model="meta.id" size="small" />
             </div>
             <div class="space" v-if="edit">
+                <div class="form-label" v-if="!meta.isTemplate">选择模板</div>
+                <div class="form-input" v-if="!meta.isTemplate">
+                    <a-select show-search placeholder="选择模板" style="width: 100px;" 
+                        v-model="meta.tid" size="small" @select="changeTemplate">
+                        <a-select-option v-for="(template, key) in scene.templates" :key="template.tid">
+                            {{template.tname}}
+                        </a-select-option>
+                    </a-select>
+                </div>
+                <div class="form-label" v-if="meta.isTemplate" @click="selectAttr = 'tname'">模板名称</div>
+                <div class="form-input" v-if="meta.isTemplate" @click="selectAttr = 'tname'">
+                    <a-input :disabled="!meta.isTemplate" style="width: 100px;" v-model="meta.tname" size="small"
+                        @change="applyChange" />
+                </div>
                 <div class="form-label" @click="selectAttr = 'category'">所属分类</div>
                 <div class="form-input" @click="selectAttr = 'category'">
                     <a-input :disabled="!meta.isTemplate" style="width: 100px;" v-model="meta.category" size="small"
-                        @change="applyChange" />
-                </div>
-                <div class="form-label" @click="selectAttr = 'tname'">模板名称</div>
-                <div class="form-input" @click="selectAttr = 'tname'">
-                    <a-input :disabled="!meta.isTemplate" style="width: 100px;" v-model="meta.tname" size="small"
                         @change="applyChange" />
                 </div>
             </div>
@@ -169,27 +193,92 @@
                     <a-input :disabled="!edit" style="width: 100px;" v-model="meta.name" size="small"
                         @change="applyChange" />
                 </div>
-                <div class="form-label">模板ID</div>
-                <div class="form-input">
-                    <a-input :disabled="!edit || meta.isTemplate" style="width: 100px;" v-model="meta.tid" size="small"
-                        @change="applyChange" />
-                </div>
             </div>
+            <div><b style="font-size: 16px;">{{meta.tname}} {{meta.name}}</b> <a-tag color="green">空闲</a-tag></div>
             <div v-if="!edit && meta.category === 'Seat'">
+                <div class="space">
+                    <div class="form-label">工位编号</div>
+                    <div class="form-input">
+                        {{meta.name}}
+                    </div>
+                    <div class="form-label">工位类型</div>
+                    <div class="form-input">
+                        普通工位
+                    </div>
+                </div>
                 <div class="space">
                     <div class="form-label">员工姓名</div>
                     <div class="form-input">
-                        谢子聪
+                        谢*聪(89XX28)
                     </div>
                     <div class="form-label">联系方式</div>
                     <div class="form-input">
-                        191xxxx7868
+                        191XXXX7868
                     </div>
                 </div>
                 <div class="space">
                     <div class="form-label">工位设备</div>
                     <div class="form-input">
-                        <a-tag>显示器</a-tag><a-tag>台式机</a-tag>
+                        <a-tag>27寸显示器</a-tag><a-tag>台式机</a-tag><a-tag>网口 XXX</a-tag>
+                    </div>
+                </div>
+                <div class="space">
+                    <div class="form-input">
+                        <a-button type="primary">更换工位</a-button>
+                        <a-button type="primary">设备管理</a-button>
+                        <a-button type="primary">释放工位</a-button>
+                    </div>
+                </div>
+            </div>
+            <div v-if="!edit && meta.tname === '会议室'">
+                <div class="space">
+                    <div class="form-label">设备</div>
+                    <div class="form-input">
+                        <a-tag>白板</a-tag><a-tag>投影仪</a-tag><a-tag>网口 XXX</a-tag>
+                    </div>
+                </div>
+                <div><b style="font-size: 16px;">下一个会议</b></div>
+                <div class="space">
+                    <div class="form-label">开始时间</div>
+                    <div class="form-input">
+                        <b>2024/01/08 09:30</b>
+                    </div>
+                    <div class="form-label">时长</div>
+                    <div class="form-input">
+                        <b>30分钟</b>
+                    </div>
+                </div>
+                <div class="space">
+                    <div class="form-label">会议内容</div>
+                    <div class="form-input">
+                        公司管理数字化产品团队周会
+                    </div>
+                </div>
+                <div class="space">
+                    <div class="form-label">预定人</div>
+                    <div class="form-input">
+                        <b>谢*聪(89XX28)</b>
+                    </div>
+                    <div class="form-label">使用人</div>
+                    <div class="form-input">
+                        钟*树(01XX76)
+                    </div>
+                </div>
+                <div class="space">
+                    <div class="form-label">所属部门</div>
+                    <div class="form-input">
+                        研发管理部
+                    </div>
+                    <div class="form-label">所属团队</div>
+                    <div class="form-input">
+                        公司管理数字化产品团队
+                    </div>
+                </div>
+                <div class="space">
+                    <div class="form-input">
+                        <a-button type="primary">预定会议</a-button>
+                        <a-button type="default">会议列表</a-button>
+                        <a-button type="default">设备管理</a-button>
                     </div>
                 </div>
             </div>

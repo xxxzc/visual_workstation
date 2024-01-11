@@ -6,7 +6,7 @@ const scene = new Scene()
 const globalControl = new Vue({
     el: "#globalControl",
     data: {
-        mode: '2d', edit: true, changed: false,
+        mode: '2d', edit: false, changed: false,
         data: {
             size: [0, 0, 0],
             path: []
@@ -37,10 +37,11 @@ const globalControl = new Vue({
                 objects = objects.filter(
                     object => {
                         let searchFields = ['tname', 'name', 'category']
-                        for (let field of searchFields) {
-                            if (object.meta[field].toLowerCase().indexOf(input) > -1) return true
+                        let index = searchFields.map(x => object.meta[x]).join("").toLocaleLowerCase()
+                        for (let s of input) {
+                            if (index.indexOf(s) === -1) return false
                         }
-                        return false
+                        return true
                     }
                 )
             }
@@ -138,10 +139,8 @@ const globalControl = new Vue({
                 else counts[category] = 1
             }
             let result = []
-            for (let [k, v] of Object.entries(counts)) {
-                result.push(
-                    { title: k + ' ' + v, key: k, children: [] }
-                )
+            for (let [key, value] of Object.entries(counts)) {
+                result.push({ key, value })
             }
             this.objectCounts = [...result]
         }

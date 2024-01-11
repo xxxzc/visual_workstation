@@ -6,12 +6,26 @@ import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 import { MapControls } from 'three/examples/jsm/controls/MapControls.js';
 
+import * as TWEEN from '@tweenjs/tween.js'
+
 import MetaObject from './metaobject.js'
 import Grid from './three_helpers/grid.js'
 import Loader from './three_helpers/loader.js'
 import { generateUUID } from 'three/src/math/MathUtils.js';
 import models from './three_helpers/models.js';
 import commonTemplates from './templates.js';
+
+function debounce(func) {
+    let isCan = true;
+    
+    return (e) => {
+      if (isCan) {
+        func(e);
+        isCan = false;
+        setTimeout(() => isCan = true, 50);
+      }
+     }
+  }
 
 export default class Scene {
 
@@ -24,6 +38,7 @@ export default class Scene {
 
         /** @type {THREE.Object3D[]} */
         this.objects = [] // 场景的所有物体
+        this.shouldLookAt = new Set(['Room', 'Seat'])
         this.curObject = null
 
         this.templates = {} // 场景的所有模板
@@ -42,7 +57,7 @@ export default class Scene {
 
         // 渲染器
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
-        // this.renderer.setAnimationLoop(this.render)
+        this.runLoop = false
 
         // 视角控制器
         this.orbitControl = new MapControls(this.camera, this.renderer.domElement)
@@ -62,8 +77,9 @@ export default class Scene {
 
         document.addEventListener('pointerdown', this.onPointerDown)
         document.addEventListener('pointerup', this.onPointerUp)
-        document.addEventListener('pointermove', this.onPointerMove)
+        document.addEventListener('pointermove', debounce(this.onPointerMove))
         window.addEventListener('resize', this.onWindowResize)
+        addEventListener("dblclick", this.onPointerUp);
 
         // 物体控制器
         this.objectControl = new TransformControls(this.camera, this.renderer.domElement)
@@ -102,6 +118,7 @@ export default class Scene {
                     model3ds: [],
                     copyDirection: 'right',
                     selectAttr: null,
+                    scene: that,
                     attrs: {
                         size: '大小(m)', color: '物体颜色', textColor: '文字颜色',
                         model3d: '3D模型', rotate3d: '旋转3D',
@@ -120,9 +137,11 @@ export default class Scene {
                         that.detachObject()
                         return
                     }
+                    if (!object.meta.isTemplate) that.objectControl.attach(object)
                     that.attachObject(object)
                     this.meta = object.meta
                     this.movePanel()
+                    that.render()
                 },
                 async applyChange() {
                     await this.meta.build()
@@ -157,6 +176,17 @@ export default class Scene {
                     that.detachObject(this.object)
                     this.setObject(await that.addTemplate(meta))
                     that.didChange()
+                },
+                changeTemplate() {
+                    // 修改模板，需要重建
+                    let t = that.templates[this.meta.tid]
+                    Object.assign(this.meta, JSON.parse(JSON.stringify(t)), {
+                        id: this.meta.id, name: this.meta.name,
+                        position: this.meta.position,
+                        size: this.meta.size, rotate: this.meta.rotate,
+                        isTemplate: false
+                    })
+                    this.applyChange()
                 },
                 onDelete() {
                     if (!this.object) return
@@ -232,6 +262,7 @@ export default class Scene {
      * @param {boolean} ctx.edit
      */
     async build({ size, objects, templates, model3ds }, { didChange, mode = "2d", edit = false }) {
+        console.log('building...')
         this.size = size
         const width = size[0]
         const height = size[1]
@@ -335,7 +366,7 @@ export default class Scene {
 
         scene.remove(this.templateTitle)
         this.templateTitle = models.text("模板列表", await this.loader.loadFont(), 1, '#333333')
-        this.templateTitle.position.set(-width / 2 - 11, height / 2 - 3, 0)
+        this.templateTitle.position.set(-width / 2 - 15, height / 2 - 3, 0)
         if (edit) scene.add(this.templateTitle)
 
         this.render()
@@ -367,7 +398,7 @@ export default class Scene {
         let idx = i % 3
         let object = await this.addObject(Object.assign({}, meta, {
             position: [
-                -this.size[0] / 2 - 4 - 5 * idx,
+                -this.size[0] / 2 - 7 - 5 * idx,
                 this.size[1] / 2 - Math.floor(i / 3) * 5 - 6,
                 meta.position[2] || 0
             ],
@@ -381,10 +412,10 @@ export default class Scene {
         if (this.curObject === object) return
         this.detachObject()
         this.curObject = object
-        object.meta.highlight('#FFA600')
+        object.meta.highlight()
         // this.panel.setObject(object)
-        this.panel.movePanel()
-        if (!object.meta.isTemplate) this.objectControl.attach(object)
+        // this.panel.movePanel()
+        // if (!object.meta.isTemplate) this.objectControl.attach(object)
         this.render()
     }
 
@@ -415,11 +446,30 @@ export default class Scene {
     }
 
     lookAtObject = (object) => {
-        if (!object) return
-        this.camera.position.set(...object.position.toArray())
-        this.camera.position.z = 30
-        this.orbitControl.target.set(...object.position.toArray())
+        this.panel.setObject(null)
+        // this.camera.position.set(...object.position.toArray())
+        let z = this.size[0] * 1.3
+        if (object) {
+            z = this.shouldLookAt.has(object.meta.category) ? 15 : 30
+        }
+        const position = object ? object.position : this.pointer
+
+        this.startAnimation()
+        new TWEEN.Tween(this.camera.position)
+            .to({ x: position.x, y: position.y, z }, 300)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .start()
+
+        new TWEEN.Tween(this.orbitControl.target)
+            .to({ x: position.x, y: position.y, z: object ? object.position.z : 0 }, 300)
+            .easing(TWEEN.Easing.Cubic.Out)
+            .onComplete(() => {
         this.panel.setObject(object)
+                this.stopAnimation()
+
+            })
+            .start()
+        
         this.render()
     }
 
@@ -427,18 +477,15 @@ export default class Scene {
         this.raycaster.setFromCamera(this.pointer, this.camera)
         const intersects = this.raycaster.intersectObjects(this.objects, true)
         if (!intersects.length) return null
-        let size = this.size[0] * this.size[1]
+        let minDist = 10000
         let minObject = null
         intersects.forEach(x => {
             let object = x.object
             let cnt = 10
             while (!object.meta && cnt--) object = object.parent
-            if (object && object === this.panel.object) {
-                minObject = object
-                size = 0
-            }
-            if (cnt > 0 && object.meta.size[0] * object.meta.size[1] < size) {
-                size = object.meta.size[0] * object.meta.size[1]
+            let distance = this.getDistance(object)
+            if (cnt > 0 && distance < minDist) {
+                minDist = distance
                 minObject = object
             }
         })
@@ -459,20 +506,19 @@ export default class Scene {
     }
 
     onPointerUp = (event) => {
+        if (event.button === 2) return
         if (event.target.__vue__) return
         if (event.target.tagName !== 'CANVAS') return
         this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1
         this.pointer.y = - (event.clientY / window.innerHeight) * 2 + 1
-
         this.onUpPosition.set(event.clientX, event.clientY)
-        // let clickObject = this.getIntersect()
-        // if (this.curObject
-        //     && this.getIntersect()
-        // ) {
-        //     this.panel.setObject(this.curObject)
-        // } else this.panel.setObject(null)
 
-        this.panel.setObject(this.getIntersect())
+        const object = this.getIntersect()
+        if (event.type === 'dblclick') {
+            this.lookAtObject(object)
+        } else {
+            this.panel.setObject(object)
+        }
     }
 
     onPointerMove = (event) => {
@@ -506,7 +552,23 @@ export default class Scene {
         this.render()
     }
 
+    startAnimation = () => {
+        this.runLoop = true
+        this.renderer.setAnimationLoop(() => {
+            console.log('run loop')
+            TWEEN.update()
+            this.renderer.render(this.scene, this.camera)
+        })
+    }
+
+    stopAnimation = () => {
+        this.runLoop = false
+        this.renderer.setAnimationLoop(null)
+    }
+
     render = () => {
+        if (this.runLoop) return
+        TWEEN.update()
         this.renderer.render(this.scene, this.camera)
     }
 
