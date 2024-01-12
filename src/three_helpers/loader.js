@@ -19,9 +19,8 @@ export default class Loader {
      * 模型、字体等加载器
      * @param {string[]} urls
      */
-    async loadMany(urls) {
-        urls.push(defaultFont)
-        await Promise.all([...new Set(urls)].map(x => this.load(x)))
+    loadMany(urls) {
+        Promise.all([...new Set(urls)].map(x => this.load(x)))
     }
 
     /**
@@ -36,13 +35,13 @@ export default class Loader {
         else return this.imgLoader
     }
 
-    load = async (url, loader) => {
+    load = (url, loader) => {
         if (!url) return
         if (url in this.objects) return this.objects[url]
         if (!loader) {
             loader = this.getLoader(url)
         }
-        this.objects[url] = await loader.loadAsync(url)
+        this.objects[url] = loader.loadAsync(url)
         return this.objects[url]
     }
 

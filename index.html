@@ -104,7 +104,8 @@
             <div id="leftTools" style="display: flex; align-items: center; gap: 10px; min-width: 20%;">
                 <a-tooltip placement="bottomLeft" title="红色表示您有未提交的修改，请及时保存哦">
                     <a-button :type="changed ? 'danger' : 'primary'" title="提交修改" shape="circle" icon="save"
-                        size="large" @click="save"></a-button>
+                        size="large" @click="save" :loading="loading">
+                    </a-button>
                 </a-tooltip>
                 <a-radio-group v-model:value="mode">
                     <a-radio-button value="2d">2D</a-radio-button>
@@ -116,7 +117,6 @@
                 <a-tooltip v-show="edit" placement="bottomLeft" title="重置">
                     <a-button shape="circle" icon="undo" @click="buildScene"></a-button>
                 </a-tooltip>
-                <!-- <a-spin :spinning="loading"></a-spin> -->
             </div>
             <a-popover title="楼层信息">
                 <template slot="content">
@@ -144,6 +144,7 @@
             </a-select>
         </dvi>
     </div>
+
     <!-- 物体面板 -->
     <div id="objectPanel" v-cloak1>
         <div class="card" v-if="object && meta">

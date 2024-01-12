@@ -135,7 +135,7 @@ export default class MetaObject {
         let model = null
         if (this.category === 'Path') {
             // 过道类型
-            model = models.plane(width, height, { color: this.color, opacity: edit ? 0.8 : 1 })
+            model = models.plane(width, height, { color: this.color, opacity: 0.8 })
             model.position.z = 0.01
         } else if (this.category === 'Room') {
             // 房间类型
@@ -179,14 +179,14 @@ export default class MetaObject {
             model = this.#build3d(await loader.load(this.model3d))
             if (!model) model = this.#build2d(await loader.load(this.model2d))
             if (!model) {
-                model = models.box(this.size, { color: this.color, opacity: edit ? 0.8 : 1 })
+                model = models.box(this.size, { color: this.color, opacity: 0.8 })
                 model.position.z = this.size[2] / 2 + 0.01
             }
         } else {
             model = this.#build2d(await loader.load(this.model2d))
             if (!model) model = this.#build3d(await loader.load(this.model3d))
             if (!model) {
-                model = models.plane(width, height, { color: this.color, opacity: edit ? 0.8 : 1 })
+                model = models.plane(width, height, { color: this.color, opacity: 0.8 })
             }
             model.position.z = 0.01
         }
@@ -260,12 +260,10 @@ export default class MetaObject {
         color = color || '#FFFF33'
         this.delight()
         let group = this.getObject3D()
-        this.border = new THREE.Group() 
-        this.border.add(
-            models.fatborder(this.size[0], this.size[1], color, 0.05 * Math.sqrt(Math.min(this.size[0], this.size[1])))
-        )
+        this.border = models.fatborder(this.size[0], this.size[1], color, 
+                0.05 * Math.sqrt(Math.min(this.size[0], this.size[1])))
+        this.border.position.z = this.size[2] + 0.05
         if (this.isTemplate) this.fitting(this.border, [2.5, 2.5, 2.5])
-        this.border.position.z = this.size[2]+0.1
         group.add(this.border)
         this.render()
     }

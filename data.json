@@ -73,6 +73,94 @@
             "inCount": true
         },
         {
+            "category": "Box",
+            "tid": "BlackBox",
+            "tname": "\u9ed1\u76d2",
+            "showLabel": false,
+            "position": [
+                -38,
+                0,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#999999",
+            "size": [
+                2,
+                2,
+                3
+            ],
+            "isTemplate": true,
+            "inCount": false
+        },
+        {
+            "category": "Box",
+            "tid": "1e3520d441214137ac85b03565b13eb1",
+            "tname": "\u7a97",
+            "showLabel": false,
+            "position": [
+                -43,
+                0,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "rotate3d": [
+                0,
+                0,
+                0
+            ],
+            "color": "#EBF5FB",
+            "size": [
+                2,
+                2,
+                3
+            ],
+            "isTemplate": true,
+            "inCount": false
+        },
+        {
+            "category": "Door",
+            "tid": "8020d8f75173-447e-b02d-e131e5a7e7bc",
+            "tname": "\u95e8",
+            "showLabel": false,
+            "position": [
+                -33,
+                5,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/WallDoorway.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1,
+                1,
+                3
+            ],
+            "isTemplate": true,
+            "inCount": false
+        },
+        {
             "category": "Room",
             "tid": "Room",
             "tname": "\u623f\u95f4",
@@ -276,13 +364,13 @@
             "inCount": true
         },
         {
-            "category": "Door",
-            "tid": "8020d8f75173-447e-b02d-e131e5a7e7bc",
-            "tname": "\u95e8",
-            "showLabel": false,
+            "category": "Elevator",
+            "tid": "Elevator",
+            "tname": "\u7535\u68af",
+            "showLabel": true,
             "position": [
-                -33,
-                5,
+                -38,
+                -5,
                 0
             ],
             "rotate2d": [
@@ -290,20 +378,19 @@
                 0,
                 0
             ],
-            "model3d": "model/WallDoorway.glb",
             "rotate3d": [
-                90,
-                180,
-                0
+                66,
+                30,
+                60
             ],
-            "color": "#fafafa",
+            "color": "#FFD9D9",
             "size": [
-                1,
-                1,
+                2,
+                2,
                 3
             ],
             "isTemplate": true,
-            "inCount": false
+            "inCount": true
         },
         {
             "category": "Appliance",
@@ -331,36 +418,6 @@
                 1,
                 1,
                 1.5
-            ],
-            "isTemplate": true,
-            "inCount": true
-        },
-        {
-            "category": "Appliance",
-            "tid": "MicroWave",
-            "tname": "\u5fae\u6ce2\u7089",
-            "showLabel": false,
-            "position": [
-                -43,
-                5,
-                0
-            ],
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Microwave.glb",
-            "rotate3d": [
-                90,
-                null,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                0.5,
-                0.5,
-                0.5
             ],
             "isTemplate": true,
             "inCount": true
@@ -396,42 +453,13 @@
             "inCount": false
         },
         {
-            "category": "Box",
-            "tid": "BlackBox",
-            "tname": "\u9ed1\u76d2",
-            "showLabel": false,
-            "position": [
-                -38,
-                0,
-                0
-            ],
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                0,
-                0,
-                0
-            ],
-            "color": "#999999",
-            "size": [
-                2,
-                2,
-                3
-            ],
-            "isTemplate": true,
-            "inCount": false
-        },
-        {
-            "category": "Box",
-            "tid": "1e3520d441214137ac85b03565b13eb1",
-            "tname": "\u7a97",
+            "category": "Appliance",
+            "tid": "MicroWave",
+            "tname": "\u5fae\u6ce2\u7089",
             "showLabel": false,
             "position": [
                 -43,
-                0,
+                5,
                 0
             ],
             "rotate2d": [
@@ -439,19 +467,20 @@
                 0,
                 0
             ],
+            "model3d": "model/Microwave.glb",
             "rotate3d": [
-                0,
-                0,
+                90,
+                null,
                 0
             ],
-            "color": "#EBF5FB",
+            "color": "#fafafa",
             "size": [
-                2,
-                2,
-                3
+                0.5,
+                0.5,
+                0.5
             ],
             "isTemplate": true,
-            "inCount": false
+            "inCount": true
         },
         {
             "category": "Desk",
@@ -459,7 +488,7 @@
             "tname": "\u50a8\u7269\u67dc",
             "showLabel": false,
             "position": [
-                -38,
+                -33,
                 -5,
                 0
             ],
@@ -482,35 +511,6 @@
             ],
             "isTemplate": true,
             "inCount": false
-        },
-        {
-            "category": "Elevator",
-            "tid": "Elevator",
-            "tname": "\u7535\u68af",
-            "showLabel": true,
-            "position": [
-                -33,
-                -5,
-                0
-            ],
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "rotate3d": [
-                66,
-                30,
-                60
-            ],
-            "color": "#FFD9D9",
-            "size": [
-                2,
-                2,
-                3
-            ],
-            "isTemplate": true,
-            "inCount": true
         }
     ],
     "objects": [
@@ -4513,6 +4513,191 @@
             ]
         },
         {
+            "category": "Desk",
+            "tid": "4612a1890fda452fa322bab76eac1baf",
+            "tname": "\u50a8\u7269\u67dc",
+            "showLabel": false,
+            "position": [
+                -4.099999999999998,
+                21.950000000000003,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Cabinet.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1,
+                1,
+                1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "775f7f46-923f-4253-b9eb-fac83898df87",
+            "name": "\u50a8\u7269\u67dc",
+            "rotate": [
+                0,
+                0,
+                90
+            ]
+        },
+        {
+            "category": "Desk",
+            "tid": "4612a1890fda452fa322bab76eac1baf",
+            "tname": "\u50a8\u7269\u67dc",
+            "showLabel": false,
+            "position": [
+                -4.099999999999998,
+                22.35,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Cabinet.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1,
+                1,
+                1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "66857fd9-a6f9-456d-b03f-f26c80e180c1",
+            "name": "\u50a8\u7269\u67dc",
+            "rotate": [
+                0,
+                0,
+                90
+            ]
+        },
+        {
+            "category": "Desk",
+            "tid": "4612a1890fda452fa322bab76eac1baf",
+            "tname": "\u50a8\u7269\u67dc",
+            "showLabel": false,
+            "position": [
+                -4.099999999999998,
+                22.75,
+                0
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Cabinet.glb",
+            "rotate3d": [
+                90,
+                180,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                1,
+                1,
+                1
+            ],
+            "isTemplate": false,
+            "inCount": false,
+            "id": "a79b0a17-a883-46ff-bb2f-f675220f8d1b",
+            "name": "\u50a8\u7269\u67dc",
+            "rotate": [
+                0,
+                0,
+                90
+            ]
+        },
+        {
+            "category": "Appliance",
+            "tid": "MicroWave",
+            "tname": "\u5fae\u6ce2\u7089",
+            "showLabel": false,
+            "position": [
+                -4.399999999999999,
+                22.400000000000002,
+                0.4
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Microwave.glb",
+            "rotate3d": [
+                90,
+                null,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                0.4,
+                0.4,
+                0.4
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "ebc1bb7f-5c10-4d81-9528-2ab4f7e974c9",
+            "name": "\u5fae\u6ce2\u7089",
+            "rotate": [
+                0,
+                0,
+                90
+            ]
+        },
+        {
+            "category": "Appliance",
+            "tid": "MicroWave",
+            "tname": "\u5fae\u6ce2\u7089",
+            "showLabel": false,
+            "position": [
+                -4.399999999999999,
+                22.900000000000006,
+                0.4
+            ],
+            "rotate2d": [
+                0,
+                0,
+                0
+            ],
+            "model3d": "model/Microwave.glb",
+            "rotate3d": [
+                90,
+                null,
+                0
+            ],
+            "color": "#fafafa",
+            "size": [
+                0.4,
+                0.4,
+                0.4
+            ],
+            "isTemplate": false,
+            "inCount": true,
+            "id": "5e79ab26-f349-4032-b100-324c44660a5c",
+            "name": "\u5fae\u6ce2\u7089",
+            "rotate": [
+                0,
+                0,
+                90
+            ]
+        },
+        {
             "category": "Elevator",
             "tid": "Elevator",
             "tname": "\u7535\u68af",
@@ -4726,191 +4911,6 @@
                 0,
                 0,
                 0
-            ]
-        },
-        {
-            "category": "Desk",
-            "tid": "4612a1890fda452fa322bab76eac1baf",
-            "tname": "\u50a8\u7269\u67dc",
-            "showLabel": false,
-            "position": [
-                -4.099999999999998,
-                21.950000000000003,
-                0
-            ],
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Cabinet.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1,
-                1,
-                1
-            ],
-            "isTemplate": false,
-            "inCount": false,
-            "id": "775f7f46-923f-4253-b9eb-fac83898df87",
-            "name": "\u50a8\u7269\u67dc",
-            "rotate": [
-                0,
-                0,
-                90
-            ]
-        },
-        {
-            "category": "Desk",
-            "tid": "4612a1890fda452fa322bab76eac1baf",
-            "tname": "\u50a8\u7269\u67dc",
-            "showLabel": false,
-            "position": [
-                -4.099999999999998,
-                22.35,
-                0
-            ],
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Cabinet.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1,
-                1,
-                1
-            ],
-            "isTemplate": false,
-            "inCount": false,
-            "id": "66857fd9-a6f9-456d-b03f-f26c80e180c1",
-            "name": "\u50a8\u7269\u67dc",
-            "rotate": [
-                0,
-                0,
-                90
-            ]
-        },
-        {
-            "category": "Desk",
-            "tid": "4612a1890fda452fa322bab76eac1baf",
-            "tname": "\u50a8\u7269\u67dc",
-            "showLabel": false,
-            "position": [
-                -4.099999999999998,
-                22.75,
-                0
-            ],
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Cabinet.glb",
-            "rotate3d": [
-                90,
-                180,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                1,
-                1,
-                1
-            ],
-            "isTemplate": false,
-            "inCount": false,
-            "id": "a79b0a17-a883-46ff-bb2f-f675220f8d1b",
-            "name": "\u50a8\u7269\u67dc",
-            "rotate": [
-                0,
-                0,
-                90
-            ]
-        },
-        {
-            "category": "Appliance",
-            "tid": "MicroWave",
-            "tname": "\u5fae\u6ce2\u7089",
-            "showLabel": false,
-            "position": [
-                -4.399999999999999,
-                22.400000000000002,
-                0.4
-            ],
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Microwave.glb",
-            "rotate3d": [
-                90,
-                null,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                0.4,
-                0.4,
-                0.4
-            ],
-            "isTemplate": false,
-            "inCount": true,
-            "id": "ebc1bb7f-5c10-4d81-9528-2ab4f7e974c9",
-            "name": "\u5fae\u6ce2\u7089",
-            "rotate": [
-                0,
-                0,
-                90
-            ]
-        },
-        {
-            "category": "Appliance",
-            "tid": "MicroWave",
-            "tname": "\u5fae\u6ce2\u7089",
-            "showLabel": false,
-            "position": [
-                -4.399999999999999,
-                22.900000000000006,
-                0.4
-            ],
-            "rotate2d": [
-                0,
-                0,
-                0
-            ],
-            "model3d": "model/Microwave.glb",
-            "rotate3d": [
-                90,
-                null,
-                0
-            ],
-            "color": "#fafafa",
-            "size": [
-                0.4,
-                0.4,
-                0.4
-            ],
-            "isTemplate": false,
-            "inCount": true,
-            "id": "5e79ab26-f349-4032-b100-324c44660a5c",
-            "name": "\u5fae\u6ce2\u7089",
-            "rotate": [
-                0,
-                0,
-                90
             ]
         }
     ]

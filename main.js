@@ -17,10 +17,13 @@ const globalControl = new Vue({
         objectCounts: []
     },
     watch: {
-        async mode() {
+        mode() {
             this.loading = true
-            await scene.switchMode(this.mode)
-            this.loading = false
+            requestAnimationFrame(() => {
+                scene.switchMode(this.mode).then(() => {
+                    this.loading = false
+                })
+            })
         },
         objects() {
             this.doCount()
@@ -75,16 +78,16 @@ const globalControl = new Vue({
         },
         async load() {
             this.loading = true
-            let result = await Promise.all([
-                fetch("http://localhost:8000/data"),
-                scene.loader.loadFont() // 加载字体很慢，预先加载
-            ])
-            this.data = await result[0].json()
+            let result = await fetch("http://localhost:8000/data")
+            this.data = await result.json()
             this.buildScene()
             this.loading = false
             this.$message.success('加载成功');
         },
         async save(e) {
+            if (this.loading) {
+                this.$message.warning('请勿重复点击！')
+            }
             if (e) e.target.blur()
 
             this.data.objects = []
@@ -101,8 +104,10 @@ const globalControl = new Vue({
                 method: "POST",
                 body: JSON.stringify(this.data)
             })
-            this.changed = false
-            this.$message.success('提交成功')
+            setTimeout(() => {
+                this.loading = false
+                this.$message.success('提交成功')
+            }, 500)
             this.doCount()
         },
         handleSearch(value) {
@@ -123,8 +128,10 @@ const globalControl = new Vue({
             if (e) e.target.blur()
             this.edit = !this.edit
             this.loading = true
-            await scene.toggleEdit(this.edit)
-            this.loading = false
+            scene.toggleEdit(this.edit)
+            setTimeout(() => {
+                this.loading = false
+            }, 500)
         },
         didChange() {
             this.changed = true

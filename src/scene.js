@@ -44,6 +44,7 @@ export default class Scene {
         this.templates = {} // 场景的所有模板
 
         this.loader = new Loader() // 模型加载器
+        this.loader.loadFont()
 
         // 相机
         this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 10000)
@@ -57,7 +58,8 @@ export default class Scene {
 
         // 渲染器
         this.renderer = new THREE.WebGLRenderer({ antialias: true })
-        this.runLoop = false
+        this.enableRender = true
+        // this.startAnimation()
 
         // 视角控制器
         this.orbitControl = new MapControls(this.camera, this.renderer.domElement)
@@ -114,7 +116,7 @@ export default class Scene {
                     object: null,
                     /** @type {MetaObject}  */
                     meta: new MetaObject(),
-                    edit: true,
+                    edit: that.edit,
                     model3ds: [],
                     copyDirection: 'right',
                     selectAttr: null,
@@ -261,7 +263,7 @@ export default class Scene {
      * @param {string} ctx.mode 
      * @param {boolean} ctx.edit
      */
-    async build({ size, objects, templates, model3ds }, { didChange, mode = "2d", edit = false }) {
+    async build({ size, objects, templates }, { didChange, mode = "2d", edit = false }) {
         console.log('building...')
         this.size = size
         const width = size[0]
@@ -269,9 +271,7 @@ export default class Scene {
 
         this.mode = mode // 展示模式
         this.edit = edit // 编辑模式
-        this.panel.edit = edit
         this.didChange = didChange // 场景变化回调函数
-        this.panel.model3ds = model3ds
 
         this.camera.position.set(0, 0, width * 1.3)
 
@@ -284,10 +284,10 @@ export default class Scene {
         const orbitControl = this.orbitControl
         orbitControl.enablePan = true
         orbitControl.target.set(0, 0, 0)
-        orbitControl.update()
+        this.orbitControl.update()
 
         // 加载所有模型
-        await this.loader.loadMany(
+        this.loader.loadMany(
             objects.map(x => x.model2d).concat(objects.map(x => x.model3d))
                 .concat(templates.map(x => x.model2d)).concat(templates.map(x => x.model3d))
         )
@@ -297,15 +297,20 @@ export default class Scene {
         oldObjects.forEach(this.removeObject)
 
         this.templates = {}
+        // 批量时，先关闭渲染
+        this.enableRender = false
         await Promise.all(templates.map(x => this.addTemplate(x)))
         // 加载默认的模板
         for await (let template of commonTemplates) {
             if (!this.templates[template.tid])
                 await this.addTemplate(template)
         }
+        // 加载物体
         await Promise.all(objects.map(x => this.addObject(x)))
+        this.toggleEdit(edit, true)
 
-        this.toggleEdit(edit)
+        this.enableRender = true
+        this.render()
     }
 
     /**
@@ -324,7 +329,7 @@ export default class Scene {
      * 仅切换编辑模式
      * @param {boolean} edit 
      */
-    toggleEdit = async (edit) => {
+    toggleEdit = async (edit, fromBuild=false) => {
         this.edit = edit
         this.panel.edit = edit
 
@@ -362,7 +367,7 @@ export default class Scene {
         if (edit) scene.add(objectControl)
 
         // 是否显示模板
-        await this.switchMode(this.mode)
+        if (!fromBuild) await this.switchMode(this.mode)
 
         scene.remove(this.templateTitle)
         this.templateTitle = models.text("模板列表", await this.loader.loadFont(), 1, '#333333')
@@ -458,17 +463,22 @@ export default class Scene {
         new TWEEN.Tween(this.camera.position)
             .to({ x: position.x, y: position.y, z }, 300)
             .easing(TWEEN.Easing.Cubic.Out)
-            .start()
-
-        new TWEEN.Tween(this.orbitControl.target)
-            .to({ x: position.x, y: position.y, z: object ? object.position.z : 0 }, 300)
-            .easing(TWEEN.Easing.Cubic.Out)
             .onComplete(() => {
-        this.panel.setObject(object)
+                this.panel.setObject(object)
+                this.orbitControl.target.set(position.x, position.y, object ? object.position.z : 0)
                 this.stopAnimation()
 
-            })
-            .start()
+            }).start()
+
+        // new TWEEN.Tween(this.orbitControl.target)
+        //     .to({ x: position.x, y: position.y, z: object ? object.position.z : 0 }, 300)
+        //     .easing(TWEEN.Easing.Cubic.Out)
+        //     .onComplete(() => {
+        //         this.panel.setObject(object)
+        //         this.stopAnimation()
+
+        //     })
+        //     .start()
         
         this.render()
     }
@@ -553,21 +563,19 @@ export default class Scene {
     }
 
     startAnimation = () => {
-        this.runLoop = true
+        this.enableRender = false
         this.renderer.setAnimationLoop(() => {
-            console.log('run loop')
-            TWEEN.update()
-            this.renderer.render(this.scene, this.camera)
+            this.render(true)
         })
     }
 
     stopAnimation = () => {
-        this.runLoop = false
+        this.enableRender = true
         this.renderer.setAnimationLoop(null)
     }
 
-    render = () => {
-        if (this.runLoop) return
+    render = (fromLoop=false) => {
+        if (!this.enableRender && !fromLoop) return
         TWEEN.update()
         this.renderer.render(this.scene, this.camera)
     }
